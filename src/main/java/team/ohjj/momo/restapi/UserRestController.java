@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import team.ohjj.momo.domain.User;
 import team.ohjj.momo.entity.UserRepository;
 
-import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/api/user")
@@ -14,34 +14,44 @@ public class UserRestController {
     UserRepository userRepository;
 
     @PostMapping("/login")
-    public Integer login(@RequestParam Map<String, Object> param) {
-        Integer id = 0;
+    public Integer login(@ModelAttribute User user) {
+        User loginUser = checkUser(userRepository.findByEmailAndPasswordAndType(user.getEmail(), user.getPassword(), user.getType()));
 
-        try {
-            String email = (String) param.get("email");
-            String password = (String) param.get("password");
-            Byte type = Byte.parseByte((String) param.get("type"));
-
-            id = userRepository.findByEmailAndPasswordAndType(email, password, type).getNo();
-        }
-        catch (Exception e) {
-            System.out.println(e);
-        }
-
-        return id;
+        return loginUser == null ? 0 : loginUser.getNo();
     }
 
     @GetMapping("/{id}")
     public User getUserInfo(@PathVariable Integer id) {
-        User user = null;
+        return checkUser(userRepository.findById(id));
+    }
+
+    @GetMapping("/check/email")
+    public Boolean checkEmail(@RequestParam String email) {
+        return checkUser(userRepository.findByEmail(email)) == null;
+    }
+
+    @GetMapping("/check/nickname")
+    public Boolean checkNickname(@RequestParam String nickname) {
+        return checkUser(userRepository.findByNickname(nickname)) == null;
+    }
+
+    @PutMapping("/insert")
+    public Integer createUser(@ModelAttribute User user) {
+        User insertedUser = userRepository.save(user);
+
+        return insertedUser == null ? 0 : insertedUser.getNo();
+    }
+
+    private User checkUser(Optional<User> user) {
+        User checkedUser = null;
 
         try {
-            user = userRepository.findById(id).get();
+            checkedUser = user.get();
         }
         catch (Exception e) {
             System.out.println(e);
         }
 
-        return user;
+        return checkedUser;
     }
 }
