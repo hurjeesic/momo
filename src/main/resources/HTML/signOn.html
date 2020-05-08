@@ -9,11 +9,6 @@
 </head>
 <body>
 <style type="text/css">
-    .jumbotron{
-        background-image: url('images/bonobono.jpg');
-        background-size: cover;
-        text-shadow: black 0.2em 0.2em 0.2em;
-        color: white;
     }
 </style>
 <nav class="navbar navbar-default">
@@ -44,16 +39,11 @@
         </div>
     </div>
 </nav>
-<div class="container">
-    <div class="jumbotron">
-        <h1 class="text-center">모모게시판</h1>
-        <p class="text-center"> 프로젝트의 거대한 도우미</p>
-    </div>
+<div class="container ">
     <form class="navbar-form navbar-left">
         <div class="container input-group input-group-lg">
             <h4><b>이메일</b></h4>
-
-            <div class="col-sm-6">
+            <div class="col-lg-6">
                 <input type="text" class="form-control" placeholder="@example.com">
                 <span class="input-group-btn">
                     <button class="btn btn-primary" type="button">인증코드 보내기</button>
@@ -70,16 +60,22 @@
         </div>
         <div class="container input-group input-group-lg">
             <h4><b>비밀번호</b></h4>
-            <input type="text" class="form-control" placeholder="비밀번호">
-            <input type="text" class="form-control" placeholder="비밀번호 확인">
+            <div class="col-sm-6">
+                <input type="text" class="form-control" placeholder="비밀번호">
+                <input type="text" class="form-control" placeholder="비밀번호 확인">
+            </div><!-- /.col-sm-6 -->
         </div>
         <div class=" container input-group input-group-lg">
             <h4><b>이름</b></h4>
-            <input type="text" class="form-control" placeholder="이름">
+            <div class="col-sm-6">
+            <input type="text" class="form-control" placeholder="홍길동">
+            </div><!-- /.col-sm-6 -->
         </div>
         <div class=" container input-group input-group-lg">
             <h4><b>전화번호</b></h4>
-            <input type="text" class="form-control" placeholder="전화번호">
+            <div class="col-sm-6">
+            <input type="text" class="form-control" placeholder="@example.com">
+            </div><!-- /.col-sm-6 -->
         </div>
         <div class=" container input-group input-group-lg">
             <button type="submit" class="btn btn-primary btn-lg">회원가입</button>
