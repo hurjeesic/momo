@@ -48,4 +48,11 @@ public class ProjectRestController {
 
         return project.isPresent() ? project.get() : null;
     }
+
+    @PutMapping("/insert")
+    public Integer createProject(@ModelAttribute Project project) {
+        Project insertedProject = projectRepository.save(project);
+
+        return insertedProject == null ? 0 : insertedProject.getNo();
+    }
 }
