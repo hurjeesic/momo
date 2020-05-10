@@ -15,24 +15,26 @@ public class UserRestController {
 
     @PostMapping("/login")
     public Integer login(@ModelAttribute User user) {
-        User loginUser = checkUser(userRepository.findByEmailAndPasswordAndType(user.getEmail(), user.getPassword(), user.getType()));
+        Optional<User> loginUser = userRepository.findByEmailAndPasswordAndType(user.getEmail(), user.getPassword(), user.getType());
 
-        return loginUser == null ? 0 : loginUser.getNo();
+        return loginUser.isPresent() ? loginUser.get().getNo() : 0;
     }
 
     @GetMapping("/{id}")
     public User getUserInfo(@PathVariable Integer id) {
-        return checkUser(userRepository.findById(id));
+        Optional<User> user = userRepository.findById(id);
+
+        return user.isPresent() ? user.get() : null;
     }
 
     @GetMapping("/check/email")
     public Boolean checkEmail(@RequestParam String email) {
-        return checkUser(userRepository.findByEmail(email)) == null;
+        return !userRepository.findByEmail(email).isPresent();
     }
 
     @GetMapping("/check/nickname")
     public Boolean checkNickname(@RequestParam String nickname) {
-        return checkUser(userRepository.findByNickname(nickname)) == null;
+        return !userRepository.findByNickname(nickname).isPresent();
     }
 
     @PutMapping("/insert")
@@ -40,18 +42,5 @@ public class UserRestController {
         User insertedUser = userRepository.save(user);
 
         return insertedUser == null ? 0 : insertedUser.getNo();
-    }
-
-    private User checkUser(Optional<User> user) {
-        User checkedUser = null;
-
-        try {
-            checkedUser = user.get();
-        }
-        catch (Exception e) {
-            System.out.println(e);
-        }
-
-        return checkedUser;
     }
 }
