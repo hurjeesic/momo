@@ -43,4 +43,11 @@ public class UserRestController {
 
         return insertedUser == null ? 0 : insertedUser.getNo();
     }
+
+    @PutMapping("/update")
+    public Integer updateUser(@ModelAttribute User user) {
+        User updatedUser = userRepository.save(user);
+
+        return updatedUser == null ? 0 : updatedUser.getNo();
+    }
 }
