@@ -55,4 +55,11 @@ public class ProjectRestController {
 
         return insertedProject == null ? 0 : insertedProject.getNo();
     }
+
+    @PutMapping("/update")
+    public Integer updateProject(@ModelAttribute Project project) {
+        Project updatedProject = projectRepository.save(project);
+
+        return updatedProject == null ? 0 : updatedProject.getNo();
+    }
 }
