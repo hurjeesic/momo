@@ -62,4 +62,21 @@ public class ProjectRestController {
 
         return updatedProject == null ? 0 : updatedProject.getNo();
     }
+
+    @DeleteMapping("/delete/{no}")
+    public Integer deleteProject(@PathVariable Integer no, @RequestParam String email) {
+        Integer result = 0;
+
+        try {
+            if (!email.equals(projectRepository.findById(no).get().getOrganizer().getEmail())) {
+                projectRepository.deleteById(no);
+                result = no;
+            }
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return result;
+    }
 }
