@@ -41,4 +41,11 @@ public class ProjectRestController {
 
         return partProject;
     }
+
+    @GetMapping("/{no}")
+    public Project getProject(@PathVariable Integer no) {
+        Optional<Project> project = projectRepository.findById(no);
+
+        return project.isPresent() ? project.get() : null;
+    }
 }
