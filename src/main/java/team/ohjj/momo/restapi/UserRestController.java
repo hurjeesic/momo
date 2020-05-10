@@ -50,4 +50,18 @@ public class UserRestController {
 
         return updatedUser == null ? 0 : updatedUser.getNo();
     }
+
+    @DeleteMapping("/delete/{no}")
+    public Integer deleteUser(@PathVariable Integer no) {
+        Integer result = 0;
+
+        try {
+            userRepository.deleteById(no);
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return result;
+    }
 }
