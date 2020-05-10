@@ -8,6 +8,8 @@ import team.ohjj.momo.domain.User;
 import team.ohjj.momo.entity.UserRepository;
 
 
+import java.util.Optional;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
@@ -15,6 +17,7 @@ import static org.hamcrest.core.Is.is;
 class UserTests {
     @Autowired
     UserRepository userRepository;
+
     private Integer id = 1;
     private String email = "test1@gmail.com";
     private String password = "test1";
@@ -80,17 +83,21 @@ class UserTests {
 
     @Test
     public void deleteUser() {
+        User user = new User();
+
+        user.setEmail("test4@gmail.com");
+        user.setPassword("test4");
+        user.setNickname("test4");
+        user.setPhone("010-3853-2947");
+        user.setType((byte) 2);
+
+        User insertedUser = userRepository.save(user);
+
+        Integer id = insertedUser.getNo();
         userRepository.deleteById(id);
 
-        User deletedUser = null;
+        Optional<User> deletedUser = userRepository.findById(id);
 
-        try {
-            deletedUser = userRepository.findById(id).get();
-        }
-        catch (Exception e) {
-            System.out.println(e);
-        }
-
-        assertThat(deletedUser, IsNull.nullValue());
+        assertThat(deletedUser.isPresent(), is(false));
     }
 }

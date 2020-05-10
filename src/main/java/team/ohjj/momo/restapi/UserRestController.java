@@ -24,24 +24,16 @@ public class UserRestController {
 
     @PostMapping("/login")
     public Integer login(@ModelAttribute User user) {
-        User loginUser = checkUser(userRepository.findByEmailAndPasswordAndType(user.getEmail(), user.getPassword(), user.getType()));
+        Optional<User> loginUser = userRepository.findByEmailAndPasswordAndType(user.getEmail(), user.getPassword(), user.getType());
 
-        return loginUser == null ? 0 : loginUser.getNo();
+        return loginUser.isPresent() ? loginUser.get().getNo() : 0;
     }
 
     @GetMapping("/{id}")
     public User getUserInfo(@PathVariable Integer id) {
-        return checkUser(userRepository.findById(id));
-    }
+        Optional<User> user = userRepository.findById(id);
 
-    @GetMapping("/check/email")
-    public Boolean checkEmail(@RequestParam String email) {
-        return checkUser(userRepository.findByEmail(email)) == null;
-    }
-
-    @GetMapping("/check/nickname")
-    public Boolean checkNickname(@RequestParam String nickname) {
-        return checkUser(userRepository.findByNickname(nickname)) == null;
+        return user.isPresent() ? user.get() : null;
     }
 
     @PutMapping("/insert")
@@ -49,6 +41,16 @@ public class UserRestController {
         User insertedUser = userRepository.save(user);
 
         return insertedUser == null ? 0 : insertedUser.getNo();
+    }
+
+    @GetMapping("/check/email")
+    public Boolean checkEmail(@RequestParam String email) {
+        return !userRepository.findByEmail(email).isPresent();
+    }
+
+    @GetMapping("/check/nickname")
+    public Boolean checkNickname(@RequestParam String nickname) {
+        return !userRepository.findByNickname(nickname).isPresent();
     }
 
     @GetMapping("/confirm/email")
@@ -64,9 +66,9 @@ public class UserRestController {
 
             mailHandler.setSubject("이메일 인증 코드");
             mailHandler.setText(new StringBuffer()
-                .append("모모게시판 회원가입을 위한 이메일 인증 코드 메일입니다.<br>")
-                .append("인증 코드 : <b>"+ authKey + "</b>")
-                .toString()
+                    .append("모모게시판 회원가입을 위한 이메일 인증 코드 메일입니다.<br>")
+                    .append("인증 코드 : <b>"+ authKey + "</b>")
+                    .toString()
             );
 
             mailHandler.send();
@@ -78,16 +80,24 @@ public class UserRestController {
         return authKey;
     }
 
-    private User checkUser(Optional<User> user) {
-        User checkedUser = null;
+    @PutMapping("/update")
+    public Integer updateUser(@ModelAttribute User user) {
+        User updatedUser = userRepository.save(user);
+
+        return updatedUser == null ? 0 : updatedUser.getNo();
+    }
+
+    @DeleteMapping("/delete/{no}")
+    public Integer deleteUser(@PathVariable Integer no) {
+        Integer result = 0;
 
         try {
-            checkedUser = user.get();
+            userRepository.deleteById(no);
         }
         catch (Exception e) {
             System.out.println(e);
         }
 
-        return checkedUser;
+        return result;
     }
 }
