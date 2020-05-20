@@ -5,16 +5,18 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 @Getter
 @Setter
-public class ChatRoom {
+public class ChatRoom implements Serializable {
+    private static final long serialVersionUID = 6494678977089006639L;
+
     private String roomId;
     private String name;
-    private Set<WebSocketSession> sessions = new HashSet<>();
 
     @Builder
     public static ChatRoom create(String name) {
@@ -24,10 +26,5 @@ public class ChatRoom {
         chatRoom.name = name;
 
         return chatRoom;
-    }
-
-    public void remove(WebSocketSession target) {
-        String targetId = target.getId();
-        sessions.removeIf(session -> session.getId().equals(targetId));
     }
 }
