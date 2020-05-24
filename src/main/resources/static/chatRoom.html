@@ -22,6 +22,10 @@
         .dropdown:hover>.dropdown-menu {
             display: block;
         }
+
+        .list-group-item {
+            cursor: pointer;
+        }
     </style>
     <nav class="navbar navbar-default">
         <div class="container-fluid">
@@ -59,8 +63,8 @@
                     <div class="row">
                         <div class="col-12">
                             <h1>대화방</h1>
-                            <ul class="list-group">
-                                <li class="list-group-item">전체 채팅</li>
+                            <ul class="list-group" id="chatRoomList">
+                                <li class="list-group-item active">전체 채팅</li>
                                 <li class="list-group-item">개발부서</li>
                                 <li class="list-group-item">디자인 부서</li>
                             </ul>
@@ -79,7 +83,7 @@
                                 <th class="col-md-9">내용</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="messageList">
                             <tr>
                                 <td>고재우</td>
                                 <td>우리 프로젝트의 미래는 어떻게 될까??</td>
@@ -94,18 +98,125 @@
                             </tr>
                         </tbody>
                     </table>
-                    <input type="text">
+                    <input type="text" id="messageTxt">
                     <button> 입력 </button>
                 </div>
             </div>
         </div>
     </div>
 
-
+    <!-- JavaScript -->
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="js/bootstrap.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+
+    <script src="/webjars/axios/0.17.1/dist/axios.min.js"></script>
+    <script src="/webjars/sockjs-client/1.1.2/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
+    <script>
+        // websocket & stomp initialize
+        let sock = new SockJS("/ws-stomp");
+        let ws = Stomp.over(sock);
+        let reconnect = 0;
+
+        let senderId = sessionStorage.getItem('user.id');
+        let projectId = sessionStorage.getItem('project.id');
+        let roomId = sessionStorage.getItem('chat.room.id');
+        const chatRoomList = $("#chatRoomList");
+        const messageTxt = $('#messageTxt');
+        const messageList = $('#messageList');
+        const title = $('#title');
+
+        if (senderId === undefined) {
+            history.back();
+        }
+
+        function findRoomList(projectId) {
+            axios.get('/api/chat/room/list', { projectId: projectId }).then(response => {
+                let count = 0;
+                if (roomId === undefined) {
+                    roomId = response.data[0].id
+                }
+
+                chatRoomList.empty();
+                response.data.map((room) => {
+                    let className = 'list-group-item';
+                    if (room.id == roomId) {
+                        className += ' active'; // 추가할 class name
+                    }
+                    chatRoomList.append('<li class="' + className + '" id="room"' + count + '>' + room.name + '</li>');
+                    $('#room' + count).click(() => {
+                        sessionStorage.setItem('chat.room.id', room.id);
+                        location.reload();
+                    });
+                    count++;
+                });
+
+                findRoom(roomId);
+                findChatting(roomId);
+            });
+        }
+
+        function findRoom(roomId) {
+            axios.get('/api/chat/room/' + roomId).then(response => title.text(response.data.name));
+        }
+
+        function findChatting(roomId) {
+            axios.get('/api/chat/message/list/' + roomId).then(response => {
+                messageList.empty();
+                response.data.map((message) => {
+                    messageList.append('<tr><td>' + message.sender.nickname + '</td><td>' + message.message + '</td></tr>');
+                });
+            });
+        }
+
+        function sendMessage(messageTxt) {
+            ws.send('/pub/chat/message', {}, JSON.stringify({ type: 'TALK', room: { id: roomId }, sender: { no: senderId }, message: messageTxt.val() }));
+            messageTxt.val('');
+        }
+
+        function recvMessage(recv) {
+            messageList.append('<tr><td>' + message.sender.nickname + '</td><td>' + message.message + '</td></tr>');
+            if (recv.type == 'ENTER') {
+                messageList.append('<tr><td>[알림] ' + recv.message + '<td></tr>');
+            }
+            else {
+                messageList.append('<tr><td>' + recv.sender.nickname + '</td><td>' + recv.message + '<td></tr>');
+            }
+        }
+
+        function connect() {
+            // pub/sub event
+            ws.connect({}, function(frame) {
+                ws.subscribe('/sub/chat/room/' + roomId, function(message) {
+                    let recv = JSON.parse(message.body);
+                    recvMessage(recv);
+                });
+
+                ws.send('/pub/chat/message', {}, JSON.stringify({type: 'ENTER', room: { id: roomId }, sender: { no: sender }}));
+            }, function(error) {
+                if(reconnect++ <= 5) {
+                    setTimeout(function() {
+                        console.log("connection reconnect");
+                        sock = new SockJS("/ws-stomp");
+                        ws = Stomp.over(sock);
+                        connect();
+                    }, 10 * 1000);
+                }
+            });
+        }
+
+        messageTxt.keydown((key) => {
+            if (key.keyCode == 13) {
+                sendMessage(messageTxt);
+            }
+        });
+        $('#sendBtn').click(() => sendMessage(messageTxt));
+
+        findRoomList(projectId);
+        connect();
+    </script>
 </body>
 </html>
