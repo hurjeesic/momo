@@ -1,17 +1,19 @@
 package team.ohjj.momo.entity;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.socket.WebSocketSession;
 import team.ohjj.momo.domain.ChatRoom;
 import team.ohjj.momo.pubsub.RedisSubscriber;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Repository
@@ -23,10 +25,20 @@ public class ChatRoomRepository {
     private HashOperations<String, String, ChatRoom> opsHashChatRoom;
     private Map<String, ChannelTopic> topics;
 
+    @Autowired
+    private ProjectJpaRepository projectJpaRepository;
+
+    @Autowired
+    private ChatRoomJpaRepository chatRoomJpaRepository;
+
     @PostConstruct
     private void init() {
         opsHashChatRoom = redisTemplate.opsForHash();
         topics = new HashMap<>();
+
+        for (ChatRoom chatRoom: chatRoomJpaRepository.findAll()) {
+            opsHashChatRoom.put(CHAT_ROOMS, chatRoom.getId(), chatRoom);
+        }
     }
 
     public List<ChatRoom> findAllRoom() {
@@ -37,10 +49,11 @@ public class ChatRoomRepository {
         return opsHashChatRoom.get(CHAT_ROOMS, id);
     }
 
-    public ChatRoom createChatRoom(String name) {
-        ChatRoom chatRoom = ChatRoom.create(name);
+    public ChatRoom createChatRoom(String name, Integer projectId) {
+        ChatRoom chatRoom = ChatRoom.create(name, projectJpaRepository.findById(projectId).get());
 
-        opsHashChatRoom.put(CHAT_ROOMS, chatRoom.getRoomId(), chatRoom);
+        chatRoomJpaRepository.save(chatRoom);
+        opsHashChatRoom.put(CHAT_ROOMS, chatRoom.getId(), chatRoom);
 
         return chatRoom;
     }

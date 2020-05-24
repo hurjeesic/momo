@@ -3,9 +3,12 @@ package team.ohjj.momo.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
-public class Project {
+public class Project implements Serializable {
+    private static final long serialVersionUID = 6494678977089006639L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty
@@ -78,17 +81,5 @@ public class Project {
 
     public void setApply(byte apply) {
         this.apply = apply;
-    }
-
-    @Override
-    public String toString() {
-        return "Project{" +
-                "no=" + no +
-                ", title='" + title + '\'' +
-                ", content='" + content + '\'' +
-                ", organizer=" + organizer +
-                ", process=" + process +
-                ", apply=" + apply +
-                '}';
     }
 }

@@ -48,7 +48,7 @@
     }
 
     function sendMessage() {
-        ws.send('/pub/chat/message', {}, JSON.stringify({type:'TALK', roomId: roomId, sender: sender, message: message.val()}));
+        ws.send('/pub/chat/message', {}, JSON.stringify({type:'TALK', room: { id: roomId }, sender: { no: sender }, message: message.val()}));
         message.val('');
     }
 
@@ -56,7 +56,13 @@
         messages.unshift({'type': recv.type, 'sender': recv.type == 'ENTER' ? '[알림]' : recv.sender, 'message': recv.message});
         $('#messageList').empty();
         messages.forEach((message) => {
-            $('#messageList').append('<li class="list-group-item">' + message.sender + ' - ' + message.message + '</li>');
+            console.log(message.sender);
+            if (message.sender == '[알림]') {
+                $('#messageList').append('<li class="list-group-item">' + message.sender + ' - ' + message.message + '</li>');
+            }
+            else {
+                $('#messageList').append('<li class="list-group-item">' + message.sender.nickname + ' - ' + message.message + '</li>');
+            }
         });
     }
 
@@ -67,7 +73,8 @@
                 let recv = JSON.parse(message.body);
                 recvMessage(recv);
             });
-            ws.send('/pub/chat/message', {}, JSON.stringify({type: 'ENTER', roomId: roomId, sender: sender}));
+
+            ws.send('/pub/chat/message', {}, JSON.stringify({type: 'ENTER', room: { id: roomId }, sender: { no: sender }}));
         }, function(error) {
             if(reconnect++ <= 5) {
                 setTimeout(function() {

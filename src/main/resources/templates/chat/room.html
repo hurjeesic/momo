@@ -38,7 +38,7 @@
             let count = 1;
             response.data.forEach((item) => {
                 roomList.append('<li class="list-group-item list-group-item-action" id="room' + count + '">' + item.name + '</li>');
-                $('#room' + count).click(() => enterRoom(item.roomId));
+                $('#room' + count).click(() => enterRoom(item.id));
                 count++;
             });
         });
@@ -51,6 +51,7 @@
         else {
             let params = new URLSearchParams();
             params.append('name', roomName.val());
+            params.append('projectId', 1);
             axios.post('/chat/room', params)
                 .then(response => {
                         alert(response.data.name + '방 개설에 성공했습니다.')
@@ -63,7 +64,8 @@
     }
 
     function enterRoom(roomId) {
-        let sender = prompt('대화명을 입력해 주세요.');
+        // let sender = prompt('대화명을 입력해 주세요.');
+        let sender = 1;
         if (sender != '') {
             localStorage.setItem('wschat.sender', sender);
             localStorage.setItem('wschat.roomId', roomId);

@@ -4,53 +4,50 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 import team.ohjj.momo.domain.User;
-import team.ohjj.momo.entity.UserRepository;
+import team.ohjj.momo.entity.UserJpaRepository;
 import team.ohjj.momo.mail.MailHandler;
 import team.ohjj.momo.mail.TempKey;
 
-import javax.mail.MessagingException;
-import java.io.UnsupportedEncodingException;
 import java.util.Optional;
-import java.util.stream.DoubleStream;
 
 @RestController
 @RequestMapping(value = "/api/user")
 public class UserRestController {
     @Autowired
-    UserRepository userRepository;
+    UserJpaRepository userJpaRepository;
 
     @Autowired
     JavaMailSender sender;
 
     @PostMapping("/login")
     public Integer login(@ModelAttribute User user) {
-        Optional<User> loginUser = userRepository.findByEmailAndPasswordAndType(user.getEmail(), user.getPassword(), user.getType());
+        Optional<User> loginUser = userJpaRepository.findByEmailAndPasswordAndType(user.getEmail(), user.getPassword(), user.getType());
 
         return loginUser.isPresent() ? loginUser.get().getNo() : 0;
     }
 
     @GetMapping("/{id}")
     public User getUserInfo(@PathVariable Integer id) {
-        Optional<User> user = userRepository.findById(id);
+        Optional<User> user = userJpaRepository.findById(id);
 
         return user.isPresent() ? user.get() : null;
     }
 
     @PutMapping("/insert")
     public Integer createUser(@ModelAttribute User user) {
-        User insertedUser = userRepository.save(user);
+        User insertedUser = userJpaRepository.save(user);
 
         return insertedUser == null ? 0 : insertedUser.getNo();
     }
 
     @GetMapping("/check/email")
     public Boolean checkEmail(@RequestParam String email) {
-        return !userRepository.findByEmail(email).isPresent();
+        return !userJpaRepository.findByEmail(email).isPresent();
     }
 
     @GetMapping("/check/nickname")
     public Boolean checkNickname(@RequestParam String nickname) {
-        return !userRepository.findByNickname(nickname).isPresent();
+        return !userJpaRepository.findByNickname(nickname).isPresent();
     }
 
     @GetMapping("/confirm/email")
@@ -82,7 +79,7 @@ public class UserRestController {
 
     @PutMapping("/update")
     public Integer updateUser(@ModelAttribute User user) {
-        User updatedUser = userRepository.save(user);
+        User updatedUser = userJpaRepository.save(user);
 
         return updatedUser == null ? 0 : updatedUser.getNo();
     }
@@ -92,7 +89,7 @@ public class UserRestController {
         Integer result = 0;
 
         try {
-            userRepository.deleteById(no);
+            userJpaRepository.deleteById(no);
         }
         catch (Exception e) {
             System.out.println(e);

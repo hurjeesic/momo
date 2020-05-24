@@ -3,7 +3,7 @@ package team.ohjj.momo.restapi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import team.ohjj.momo.domain.Project;
-import team.ohjj.momo.entity.ProjectRepository;
+import team.ohjj.momo.entity.ProjectJpaRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,17 +13,17 @@ import java.util.Optional;
 @RequestMapping(value = "/api/project")
 public class ProjectRestController {
     @Autowired
-    ProjectRepository projectRepository;
+    ProjectJpaRepository projectJpaRepository;
 
     @GetMapping("/count")
     public Integer getProjectCount() {
-        return (int)projectRepository.count();
+        return (int) projectJpaRepository.count();
     }
 
     @GetMapping("/list/{pageNo}")
     public List<Project> getProjectList(@PathVariable Integer pageNo) {
         Integer unitCount = 10;
-        List<Project> allProject = projectRepository.findAll();
+        List<Project> allProject = projectJpaRepository.findAll();
         List<Project> partProject = new ArrayList<>();
 
         try {
@@ -44,21 +44,21 @@ public class ProjectRestController {
 
     @GetMapping("/{no}")
     public Project getProject(@PathVariable Integer no) {
-        Optional<Project> project = projectRepository.findById(no);
+        Optional<Project> project = projectJpaRepository.findById(no);
 
         return project.isPresent() ? project.get() : null;
     }
 
     @PutMapping("/insert")
     public Integer createProject(@ModelAttribute Project project) {
-        Project insertedProject = projectRepository.save(project);
+        Project insertedProject = projectJpaRepository.save(project);
 
         return insertedProject == null ? 0 : insertedProject.getNo();
     }
 
     @PutMapping("/update")
     public Integer updateProject(@ModelAttribute Project project) {
-        Project updatedProject = projectRepository.save(project);
+        Project updatedProject = projectJpaRepository.save(project);
 
         return updatedProject == null ? 0 : updatedProject.getNo();
     }
@@ -68,8 +68,8 @@ public class ProjectRestController {
         Integer result = 0;
 
         try {
-            if (!email.equals(projectRepository.findById(no).get().getOrganizer().getEmail())) {
-                projectRepository.deleteById(no);
+            if (!email.equals(projectJpaRepository.findById(no).get().getOrganizer().getEmail())) {
+                projectJpaRepository.deleteById(no);
                 result = no;
             }
         }

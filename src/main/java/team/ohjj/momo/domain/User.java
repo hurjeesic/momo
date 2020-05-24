@@ -4,9 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
-public class User {
+public class User implements Serializable {
+    private static final long serialVersionUID = 6494678977089006639L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty
@@ -77,17 +80,5 @@ public class User {
 
     public void setType(byte type) {
         this.type = type;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "no=" + no +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", nickname='" + nickname + '\'' +
-                ", phone='" + phone + '\'' +
-                ", type=" + type +
-                '}';
     }
 }
