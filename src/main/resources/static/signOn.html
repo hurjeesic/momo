@@ -6,6 +6,117 @@
     <title>회원가입</title>
     <link rel="stylesheet" href="css/bootstrap.css">
 </head>
+<script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#emailBtn').click(function () {
+            if ($("#userEmail").val() == "") {
+                alert("이메일을 입력하지 않았습니다.");
+            } else {
+                $.ajax({
+                    type: "get",
+                    url: "http://localhost:8080/api/user/check/email",
+                    dataType: "json",
+                    data: {email: $("#userEmail").val()},
+                    success: function (data) {
+                        if (data) {
+                            alert("사용가능한 이메일입니다. 인증번호를 입력해주세요.");
+                            $.ajax({
+                                type: "get",
+                                url: "http://localhost:8080/api/user/confirm/email",
+                                data: {email: $("#userEmail").val()},
+                                async: false,
+                                success: function (data) {
+                                    if (data) {
+                                        alert("인증코드가 전송되었습니다.");
+                                    } else {
+                                        alert("인증코드 전송을 실패했습니다.");
+                                    }
+                                },
+                                error: function () {
+                                    alert("인증코드 전송 실패");
+
+                                }
+                            });
+                            $("#emailBtn").attr("disabled", "disabled");
+                        } else {
+                            alert("사용이 불가능한 이메일 입니다.");
+                        }
+                    },
+                    error: function () {
+                        alert("가입실패");
+                    }
+                });
+            }
+
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('#emailCheck').click(function () {
+            $.ajax({
+                type: "get",
+                url: "",
+                data: {nickname: $("#userEmail").val()},
+                success: function (data) {
+                    alert("메일인증이 완료되었습니다..");
+                    $("#emailCheck").attr("disabled", "disabled");
+                },
+                error: function () {
+                    alert("인증코드가 틀렸습니다.");
+                }
+            });
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('#nameCheck').click(function () {
+            if ($("#userName").val() == "") {
+                alert("닉네임을 입력하지 않았습니다.");
+            } else {
+                $.ajax({
+                    type: "get",
+                    url: "http://localhost:8080/api/user/check/nickname",
+                    data: {nickname: $("#userName").val()},
+                    success: function (data) {
+                        alert("사용가능한 닉네임입니다.");
+                        $("#nameCheck").attr("disabled", "disabled");
+                    },
+                    error: function () {
+                        alert("사용불가능한 닉네임입니다.");
+                    }
+                });
+            }
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('#signUp').click(function () {
+            if ($('#userPw').val() == $('#userPwCheck').val()) {
+                $.ajax({
+                    type: "put",
+                    url: "http://localhost:8080/api/user/insert",
+                    data: {
+                        email: $("#userEmail").val(), password: $("#userPw").val(),
+                        nickname: $("#userName").val(), phone: $("#userPhone").val()
+                    },
+                    success: function (data) {
+                        console.log("성공")
+                        alert("회원가입 성공");
+                    },
+                    error: function () {
+                        alert("회원가입 실패");
+                    }
+                });
+            } else {
+                alert("비밀번호가 틀렸습니다.");
+            }
+        });
+    });
+</script>
 <body>
 <nav class="navbar navbar-default">
     <div class="container-fluid">
@@ -27,9 +138,9 @@
         <div class="container input-group input-group-lg">
             <h4><b>이메일</b></h4>
             <div class="col-lg-6">
-                <input type="text" class="form-control" placeholder="@example.com">
+                <input type="text" class="form-control" placeholder="@example.com" id="userEmail">
                 <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button">인증코드 보내기</button>
+                    <button class="btn btn-primary" type="button" id="emailBtn">인증코드 보내기</button>
                 </span>
             </div><!-- /.col-sm-6 -->
         </div>
@@ -37,36 +148,36 @@
             <div class="col-sm-6">
                 <input type="text" class="form-control" placeholder="인증코드">
                 <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button">확인</button>
+                    <button class="btn btn-primary" type="button" id="emailCheck">확인</button>
                 </span>
             </div><!-- /.col-sm-6 -->
         </div>
         <div class="container input-group input-group-lg">
             <h4><b>비밀번호</b></h4>
             <div class="col-sm-3">
-                <input type="text" class="form-control" placeholder="비밀번호">
-                <input type="text" class="form-control" placeholder="비밀번호 확인">
+                <input type="text" class="form-control" placeholder="비밀번호" id="userPw">
+                <input type="text" class="form-control" placeholder="비밀번호 확인" id="userPwCheck">
             </div><!-- /.col-sm-6 -->
         </div>
-        <div class=" container input-group input-group-lg">
+        <div class="container input-group input-group-lg">
             <h4><b>닉네임</b></h4>
             <div class="col-sm-6">
-                <input type="text" class="form-control" placeholder="홍길동">
+                <input type="text" class="form-control" placeholder="홍길동" id="userName">
                 <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button">중복확인</button>
+                    <button class="btn btn-primary" type="button" id="nameCheck">중복확인</button>
                 </span>
             </div><!-- /.col-sm-6 -->
         </div>
-        <div class=" container input-group input-group-lg">
+        <div class="container input-group input-group-lg">
             <h4><b>전화번호</b></h4>
             <div class="col-sm-6">
-                <input type="text" class="form-control" placeholder="@example.com">
+                <input type="text" class="form-control" placeholder="@example.com" id="userPhone">
             </div><!-- /.col-sm-6 -->
         </div>
         <div class="container input-group input-group-lg">
             <div class="row">
                 <div class="col text-center">
-                    <button class="btn btn-primary btn-lg">회원가입</button>
+                    <button class="btn btn-primary btn-lg" id="signUp">회원가입</button>
                 </div>
             </div>
         </div>
