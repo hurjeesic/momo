@@ -6,6 +6,41 @@
 		<title>로그인페이지</title>
 		<link rel="stylesheet" href="css/bootstrap.css">
 	</head>
+	<script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script>
+		$(document).ready(function() {
+
+				$.ajax({
+					type: "get",
+					url: "http://localhost:8080/api/user/{id}",
+					success: function (data) {
+
+					},
+					error: function () {
+
+					}
+				});
+
+		});
+	</script>
+	<script>
+		$(document).ready(function() {
+			$('#loginBtn').click(function () {
+				$.ajax({
+					type: "post",
+					url: "http://localhost:8080/api/user/login",
+					dataType: "json",
+					data: {email: $("#userEmail").val(), password : $("#userPw").val()},
+					success: function (data) {
+						alert("로그인 성공");
+					},
+					error: function () {
+						alert("로그인 실패");
+					}
+				});
+			});
+		});
+	</script>
 	<body>
 		<style type="text/css">
 			.jumbotron{
@@ -55,7 +90,7 @@
 				<div class=" container input-group input-group-lg">
 					<input type="text" class="form-control" placeholder="비밀번호">
 				<br>
-				<button type="submit" class="btn btn-primary btn-lg">로그인</button>
+				<button type="submit" class="btn btn-primary btn-lg" id = "loginBtn">로그인</button>
 				<br>
 				<button type="button" class="btn btn-default">회원가입</button>
 				<button type="button" class="btn btn-default">비밀번호 찾기</button>
