@@ -13,24 +13,6 @@
             color: white;
         }
     </style>
-    <script>
-        $(document).ready(function () {
-            $('#loginBtn').click(function () {
-                $.ajax({
-                    type: "post",
-                    url: "http://localhost:8080/api/user/login",
-                    dataType: "json",
-                    data: {email: $("#userEmail").val(), password: $("#userPw").val()},
-                    success: function (data) {
-                        alert("로그인 성공");
-                    },
-                    error: function () {
-                        alert("로그인 실패");
-                    }
-                });
-            });
-        });
-    </script>
 </head>
 <body>
 <nav class="navbar navbar-default">
@@ -67,15 +49,16 @@
         <p class="text-center"> 프로젝트의 거대한 도우미</p>
     </div>
     <form class="navbar-form navbar-left">
+        <input type="hidden" id="type" value="2">
         <div class="container input-group input-group-lg">
-            <input type="text" class="form-control" placeholder="이메일">
+            <input type="email" class="form-control" id="emailTxt" placeholder="이메일">
         </div>
         <div class=" container input-group input-group-lg">
-            <input type="text" class="form-control" placeholder="비밀번호">
+            <input type="password" class="form-control" id="pwdTxt" placeholder="비밀번호">
             <br>
-            <button type="submit" class="btn btn-primary btn-lg">로그인</button>
+            <button type="button" class="btn btn-primary btn-lg" id="loginBtn">로그인</button>
             <br>
-            <button type="button" class="btn btn-default">회원가입</button>
+            <button type="button" class="btn btn-default" id="signUpBtn">회원가입</button>
             <button type="button" class="btn btn-default">비밀번호 찾기</button>
         </div>
     </form>
@@ -83,5 +66,43 @@
 
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script src="js/bootstrap.js"></script>
+<script>
+	const emailTxt = $('#emailTxt');
+
+	$('#loginBtn').on('click', () => {
+		if (emailTxt.val() == '') {
+			alert('이메일을 입력해주세요.');
+			emailTxt.focus();
+		}
+		else {
+			const emailExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
+
+			if (emailExp.test(emailTxt.val())) {
+				$.ajax({
+					type: 'post',
+					url: 'http://localhost:8080/api/user/login',
+					dataType: 'json',
+					data: { email: emailTxt.val(), password: $('#pwdTxt').val(), type: $('#type').val() },
+					success: (data) => {
+						window.location = './index.html';
+					},
+					error: () => {
+						alert('아이디 또는 비밀번호를 다시 입력해주세요.');
+						emailTxt.focus();
+					}
+				});
+			}
+			else {
+				alert('올바르지 않은 이메일 형식입니다.');
+				emailTxt.val('');
+				emailTxt.focus();
+			}
+		}
+	});
+
+	$('#signUpBtn').on('click', () => {
+		window.location = './signOn.html';
+	});
+</script>
 </body>
 </html>

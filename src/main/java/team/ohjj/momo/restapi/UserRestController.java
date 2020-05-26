@@ -9,9 +9,9 @@ import team.ohjj.momo.mail.MailHandler;
 import team.ohjj.momo.mail.TempKey;
 
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 import java.util.Optional;
-import java.util.stream.DoubleStream;
 
 @RestController
 @RequestMapping(value = "/api/user")
@@ -22,11 +22,16 @@ public class UserRestController {
     @Autowired
     JavaMailSender sender;
 
-    @PostMapping("/login")
-    public Integer login(@ModelAttribute User user) {
-        Optional<User> loginUser = userRepository.findByEmailAndPasswordAndType(user.getEmail(), user.getPassword(), user.getType());
+    private final int minute = 60;
 
-        return loginUser.isPresent() ? loginUser.get().getNo() : 0;
+    @PostMapping("/login")
+    public Integer login(HttpSession session, @ModelAttribute User user) {
+        user = userRepository.findByEmailAndPasswordAndType(user.getEmail(), user.getPassword(), user.getType()).get();
+
+        session.setMaxInactiveInterval(10 * minute);
+        session.setAttribute("user", user);
+
+        return user.getNo();
     }
 
     @GetMapping("/{id}")
@@ -36,11 +41,16 @@ public class UserRestController {
         return user.isPresent() ? user.get() : null;
     }
 
-    @PutMapping("/insert")
-    public Integer createUser(@ModelAttribute User user) {
-        User insertedUser = userRepository.save(user);
+    @PostMapping("/insert")
+    public Integer createUser(HttpSession session, @ModelAttribute User user) {
+        if ((Boolean)session.getAttribute("authorization")) {
+            session.removeAttribute("authorization code");
+            session.removeAttribute("authorization");
 
-        return insertedUser == null ? 0 : insertedUser.getNo();
+            return userRepository.save(user).getNo();
+        }
+
+        return null;
     }
 
     @GetMapping("/check/email")
@@ -54,30 +64,33 @@ public class UserRestController {
     }
 
     @GetMapping("/confirm/email")
-    public String getConfirmCode(@RequestParam String email) {
-        String authKey = null;
+    public void getConfirmCode(HttpSession session, @RequestParam String email) throws MessagingException, UnsupportedEncodingException {
+        MailHandler mailHandler = new MailHandler(sender);
 
-        try {
-            authKey = TempKey.getInstance().getKey(5, false);
-            MailHandler mailHandler = new MailHandler(sender);
+        mailHandler.setFrom("jshur2015108211@gmail.com", "모모게시판");
+        mailHandler.setTo(email);
 
-            mailHandler.setFrom("jshur2015108211@gmail.com", "모모게시판");
-            mailHandler.setTo(email);
+        session.setMaxInactiveInterval(5 * minute);
+        session.setAttribute("authorization code", TempKey.getInstance().getKey(5, false));
+        session.setAttribute("authorization", false);
+        mailHandler.setSubject("이메일 인증 코드");
+        mailHandler.setText(new StringBuffer()
+                .append("모모게시판 회원가입을 위한 이메일 인증 코드 메일입니다.<br>")
+                .append("인증 코드 : <b>" + session.getAttribute("authorization code") + "</b>")
+                .toString()
+        );
 
-            mailHandler.setSubject("이메일 인증 코드");
-            mailHandler.setText(new StringBuffer()
-                    .append("모모게시판 회원가입을 위한 이메일 인증 코드 메일입니다.<br>")
-                    .append("인증 코드 : <b>"+ authKey + "</b>")
-                    .toString()
-            );
+        mailHandler.send();
+    }
 
-            mailHandler.send();
+    @GetMapping("/confirm/email/check")
+    public Boolean checkCode(HttpSession session, @RequestParam String code) {
+        if (session.getAttribute("authorization code").equals(code)) {
+            session.setAttribute("authorization", true);
+            return true;
         }
-        catch (Exception e) {
-            System.out.println(e);
-        }
 
-        return authKey;
+        return false;
     }
 
     @PutMapping("/update")
