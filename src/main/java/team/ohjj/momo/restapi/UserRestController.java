@@ -25,10 +25,13 @@ public class UserRestController {
     private final int minute = 60;
 
     @PostMapping("/login")
-    public Integer login(@ModelAttribute User user) {
-        Optional<User> loginUser = userRepository.findByEmailAndPasswordAndType(user.getEmail(), user.getPassword(), user.getType());
+    public Integer login(HttpSession session, @ModelAttribute User user) {
+        user = userRepository.findByEmailAndPasswordAndType(user.getEmail(), user.getPassword(), user.getType()).get();
 
-        return loginUser.isPresent() ? loginUser.get().getNo() : 0;
+        session.setMaxInactiveInterval(10 * minute);
+        session.setAttribute("user", user);
+
+        return user.getNo();
     }
 
     @GetMapping("/{id}")
