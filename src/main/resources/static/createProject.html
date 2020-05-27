@@ -210,22 +210,28 @@
 				number.attr('name', `ApplyFieldList[${ i }].number`, number);
 			}
 
-			if (valid && fieldValid) {
-				$.ajax({
-					type: 'post',
-					url: 'http://localhost:8080/api/project/insert',
-					dataType: 'json',
-					data: $('form').serializeArray(),
-					async: false,
-					success: (data) => {
-						alert('프로젝트가 생성되었습니다.');
-						window.location = './index.html';
-					},
-					error: () => {
-						alert('세션이 만료되었습니다.');
-						window.location = './signIn.html';
-					}
-				});
+			if (valid) {
+				if (fieldValid) {
+					$.ajax({
+						type: 'post',
+						url: 'http://localhost:8080/api/project/insert',
+						dataType: 'json',
+						data: $('form').serializeArray(),
+						async: false,
+						success: (data) => {
+							alert('프로젝트가 생성되었습니다.');
+							window.location = './index.html';
+						},
+						error: () => {
+							alert('세션이 만료되었습니다.');
+							window.location = './signIn.html';
+						}
+					});
+				}
+                else {
+					alert('본인의 역할은 전체 역할 내에 있어야합니다.');
+					myFieldTxt.focus();
+				}
 			}
 		}
 	});

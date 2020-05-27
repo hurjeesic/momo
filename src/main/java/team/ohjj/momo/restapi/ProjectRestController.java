@@ -70,17 +70,19 @@ public class ProjectRestController {
 	}
 
 	@PostMapping("/insert")
-	public Integer createProject(HttpSession session, @ModelAttribute Project project, @ModelAttribute ApplyFieldList applyFields, @ModelAttribute Member member) {
+	public Integer createProject(HttpSession session, @ModelAttribute Project project, @ModelAttribute ApplyFieldList applyFields, @RequestParam String field) {
 		User user = (User)session.getAttribute("user");
 
 		project.setOrganizer(user);
 		project = projectRepository.save(project);
 
+		Member member = new Member();
+		member.setUser(user);
 		member.setProject(project);
 		for (ApplyField applyField : applyFields.getApplyFieldList()) {
 			applyField.setProject(project);
 			applyFieldJpaRepository.save(applyField);
-			if (applyField.getField().equals(member.getField())) {
+			if (applyField.getField().equals(field)) {
 				member.setField(applyField);
 				memberJpaRepository.save(member);
 			}
