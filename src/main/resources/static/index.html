@@ -68,37 +68,38 @@
                             <th class="col-md-2">현재인원</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td class="dropdown"><a href="">게임만들기</a>
-                                <a class="dropdown-toggle pull-right"
-                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                    게임만들기에 대한 간단한 설명입니다 이건 게임을 만드는 프로젝트에요
-                                </div>
-                            </td>
-                            <td>모집중</td>
-                            <td>고재우</td>
-                            <td class="dropdown">4/5
-                                <a class="dropdown-toggle pull-right"
-                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    ▽
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                    개발자 3 / 4
-                                    <br>
-                                    기획자 1 / 1
-                                </div>
-                            </td>
-                        </tr>
+                        <tbody id="projectList">
+<!--                        <tr>-->
+<!--                            <td>1</td>-->
+<!--                            <td class="dropdown"><a href="">게임만들기</a>-->
+<!--                                <a class="dropdown-toggle pull-right"-->
+<!--                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+<!--                                </a>-->
+<!--                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">-->
+<!--                                    게임만들기에 대한 간단한 설명입니다 이건 게임을 만드는 프로젝트에요-->
+<!--                                </div>-->
+<!--                            </td>-->
+<!--                            <td>모집중</td>-->
+<!--                            <td>고재우</td>-->
+<!--                            <td class="dropdown">4/5-->
+<!--                                <a class="dropdown-toggle pull-right"-->
+<!--                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+<!--                                    ▽-->
+<!--                                </a>-->
+<!--                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">-->
+<!--                                    개발자 3 / 4-->
+<!--                                    <br>-->
+<!--                                    기획자 1 / 1-->
+<!--                                </div>-->
+<!--                            </td>-->
+<!--                        </tr>-->
                         </tbody>
                     </table>
                 </div>
                 <div class="form-group pull-right">
                     <input type="text" class="search form-control" placeholder="검색 단어입력">
-                    <button class="submit">검색</button>
+                    <button type="button" class="submit">검색</button>
+                    <button type="button" class="submit" id="createBtn">프로젝트 생성</button>
                 </div>
             </div>
         </div>
@@ -120,8 +121,115 @@
 
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script src="js/bootstrap.js"></script>
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<script>
+	const projectList = $('#projectList');
+	const createBtn = $('#createBtn');
+	const params = getParameters();
+	const pageNo = params.page;
+
+	function getParameters() {
+		const url = document.location.href;
+		const qs = url.substring(url.indexOf('?') + 1).split('&');
+		const result = {};
+		for (let i = 0; i < qs.length; i++) {
+			qs[i] = qs[i].split('=');
+			result[qs[i][0]] = decodeURIComponent(qs[i][1]);
+		}
+
+		return result;
+	}
+
+	$.ajax({
+		type: 'get',
+		url: 'http://localhost:8080/api/user/',
+		dataType: 'json',
+		async: false,
+		success: (data) => {
+			// 받은 유저 정보를 출력
+		},
+		error: () => {
+			alert('세션이 만료되었습니다.');
+			window.location = './signIn.html';
+		}
+	});
+
+	$.ajax({
+		type: 'get',
+		url: `http://localhost:8080/api/project/list/${ pageNo == undefined ? 1 : pageNo }`,
+		dataType: 'json',
+		success: (data) => {
+			projectList.empty();
+			data.map((obj) => {
+				let item = `<tr><td>${ obj.project.no }</td><td class="dropdown">` +
+					`<a href=http://localhost:8080/projectDetail.html">${ obj.project.title }</a>` +
+					'<a class="dropdown-toggle pull-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>' +
+					`<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">${ obj.project.content }</div></td><td>`;
+
+				switch (obj.project.process) {
+					case 0:
+						item += '모집중';
+						break;
+					case 1:
+						item += '진행중';
+						break;
+					case 2:
+						item += '완료';
+						break;
+				}
+
+				item += `</td><td>${ obj.project.organizer.nickname }</td>`;
+
+				const presentNumbers = {};
+				const allNumbers = {};
+				let presentNumber = 0, allNumber = 0;
+				for (const member of obj.members) { // 현재 인원 현황
+					if (presentNumbers.hasOwnProperty(member.field.field)) {
+						presentNumbers[member.field.field]++;
+					}
+					else {
+						presentNumbers[member.field.field] = 1;
+					}
+
+					presentNumber++;
+				}
+
+				for (let applyField of obj.applyFields) { // 전체 인원 현황
+					if (allNumbers.hasOwnProperty(applyField.field)) {
+						allNumbers[applyField.field]++;
+					}
+					else {
+						allNumbers[applyField.field] = 1;
+					}
+
+					allNumber++;
+				}
+
+				item += `<td class="dropdown">${ presentNumber } / ${ allNumber }` +
+					'<a class="dropdown-toggle pull-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">▽</a>' +
+					'<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">';
+
+				for (let field in allNumbers) {
+					item += `${ field } ${ presentNumbers[field] ? presentNumbers[field] : 0 } / ${ allNumbers[field] }<br>`;
+				}
+
+				item = item.substr(0, item.length - 4);
+
+				item += '</div></td></tr>';
+
+				projectList.append(item);
+			});
+		},
+		error: () => {
+			alert('세션이 만료되었습니다.');
+			window.location = './signIn.html';
+		}
+	});
+
+	createBtn.on('click', () => {
+		window.location = './createProject.html';
+	});
+</script>
 </body>
 </html>

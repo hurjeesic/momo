@@ -2,81 +2,113 @@ package team.ohjj.momo.restapi;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import team.ohjj.momo.domain.Project;
+import team.ohjj.momo.domain.*;
+import team.ohjj.momo.entity.ApplyFieldJpaRepository;
+import team.ohjj.momo.entity.MemberJpaRepository;
 import team.ohjj.momo.entity.ProjectRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import javax.servlet.http.HttpSession;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = "/api/project")
 public class ProjectRestController {
-    @Autowired
-    ProjectRepository projectRepository;
+	@Autowired
+	ProjectRepository projectRepository;
 
-    @GetMapping("/count")
-    public Integer getProjectCount() {
-        return (int)projectRepository.count();
-    }
+	@Autowired
+	ApplyFieldJpaRepository applyFieldJpaRepository;
 
-    @GetMapping("/list/{pageNo}")
-    public List<Project> getProjectList(@PathVariable Integer pageNo) {
-        Integer unitCount = 10;
-        List<Project> allProject = projectRepository.findAll();
-        List<Project> partProject = new ArrayList<>();
+	@Autowired
+	MemberJpaRepository memberJpaRepository;
 
-        try {
-            for (int i = unitCount * (pageNo - 1); i < unitCount * pageNo; i++) {
-                partProject.add(allProject.get(i));
-                Project presentProject = partProject.get(i - unitCount * (pageNo - 1));
-                if (presentProject.getContent().length() > 20) {
-                    presentProject.setContent(presentProject.getContent().substring(0, 20) + "...");
-                }
-            }
-        }
-        catch (Exception e) {
-            System.out.println(e);
-        }
+	@GetMapping("/count")
+	public Integer getProjectCount() {
+		return (int)projectRepository.count();
+	}
 
-        return partProject;
-    }
+	@GetMapping("/list/{pageNo}")
+	public List<Map<String, Object>> getProjectList(@PathVariable Integer pageNo) {
+		Integer unitCount = 10;
+		List<Project> allProject = projectRepository.findAll();
+		List<Project> partProject = new ArrayList<>();
+		List<Map<String, Object>> result = new ArrayList<>();
 
-    @GetMapping("/{no}")
-    public Project getProject(@PathVariable Integer no) {
-        Optional<Project> project = projectRepository.findById(no);
+		try {
+			int endPage = unitCount * pageNo;
+			for (int i = endPage - 10; i < (allProject.size() < endPage ? allProject.size() : endPage); i++) {
+				Map<String, Object> projectObj = new HashMap<>();
+				partProject.add(allProject.get(i));
+				Project presentProject = partProject.get(i - unitCount * (pageNo - 1));
 
-        return project.isPresent() ? project.get() : null;
-    }
+				List<ApplyField> applyFieldList = applyFieldJpaRepository.findAllByProject(presentProject);
+				List<Member> memberList = memberJpaRepository.findAllByProject(presentProject);
 
-    @PutMapping("/insert")
-    public Integer createProject(@ModelAttribute Project project) {
-        Project insertedProject = projectRepository.save(project);
+				if (presentProject.getContent().length() > 20) {
+					presentProject.setContent(presentProject.getContent().substring(0, 20) + "...");
+				}
 
-        return insertedProject == null ? 0 : insertedProject.getNo();
-    }
+				projectObj.put("project", presentProject);
+				projectObj.put("applyFields", applyFieldList);
+				projectObj.put("members", memberList);
+				result.add(projectObj);
+			}
+		}
+		catch (Exception e) {
+			System.out.println(e);
+			e.printStackTrace();
+		}
 
-    @PutMapping("/update")
-    public Integer updateProject(@ModelAttribute Project project) {
-        Project updatedProject = projectRepository.save(project);
+		return result;
+	}
 
-        return updatedProject == null ? 0 : updatedProject.getNo();
-    }
+	@GetMapping("/{no}")
+	public Project getProject(@PathVariable Integer no) {
+		Optional<Project> project = projectRepository.findById(no);
 
-    @DeleteMapping("/delete/{no}")
-    public Integer deleteProject(@PathVariable Integer no, @RequestParam String email) {
-        Integer result = 0;
+		return project.isPresent() ? project.get() : null;
+	}
 
-        try {
-            if (!email.equals(projectRepository.findById(no).get().getOrganizer().getEmail())) {
-                projectRepository.deleteById(no);
-                result = no;
-            }
-        }
-        catch (Exception e) {
-            System.out.println(e);
-        }
+	@PostMapping("/insert")
+	public Integer createProject(HttpSession session, @ModelAttribute Project project, @ModelAttribute ApplyFieldList applyFields, @ModelAttribute Member member) {
+		User user = (User)session.getAttribute("user");
 
-        return result;
-    }
+		project.setOrganizer(user);
+		project = projectRepository.save(project);
+
+		member.setProject(project);
+		for (ApplyField applyField : applyFields.getApplyFieldList()) {
+			applyField.setProject(project);
+			applyFieldJpaRepository.save(applyField);
+			if (applyField.getField().equals(member.getField())) {
+				member.setField(applyField);
+				memberJpaRepository.save(member);
+			}
+		}
+
+		return project.getNo();
+	}
+
+	@PutMapping("/update")
+	public Integer updateProject(@ModelAttribute Project project) {
+		Project updatedProject = projectRepository.save(project);
+
+		return updatedProject == null ? 0 : updatedProject.getNo();
+	}
+
+	@DeleteMapping("/delete/{no}")
+	public Integer deleteProject(HttpSession session, @PathVariable Integer no) {
+		Integer result = -1;
+		User user = (User)session.getAttribute("user");
+
+		if (user == null) {
+			result = 0;
+		}
+		else if (projectRepository.findById(no).get().getOrganizer().equals(user)) {
+			projectRepository.deleteById(no);
+			result = no;
+		}
+
+		return result;
+	}
 }

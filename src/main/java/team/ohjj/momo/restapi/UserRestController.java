@@ -11,7 +11,6 @@ import team.ohjj.momo.mail.TempKey;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/api/user")
@@ -34,11 +33,9 @@ public class UserRestController {
         return user.getNo();
     }
 
-    @GetMapping("/{id}")
-    public User getUserInfo(@PathVariable Integer id) {
-        Optional<User> user = userRepository.findById(id);
-
-        return user.isPresent() ? user.get() : null;
+    @GetMapping("/")
+    public User getUserInfo(HttpSession session) {
+        return (User)session.getAttribute("user");
     }
 
     @PostMapping("/insert")
