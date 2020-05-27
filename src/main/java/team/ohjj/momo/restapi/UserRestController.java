@@ -11,7 +11,6 @@ import team.ohjj.momo.mail.TempKey;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/api/user")
@@ -28,7 +27,6 @@ public class UserRestController {
     public Integer login(HttpSession session, @ModelAttribute User user) {
         user = userRepository.findByEmailAndPasswordAndType(user.getEmail(), user.getPassword(), user.getType()).get();
 
-        session.invalidate();
         session.setMaxInactiveInterval(10 * minute);
         session.setAttribute("user", user);
 
