@@ -1,19 +1,14 @@
 package team.ohjj.momo.restapi;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import team.ohjj.momo.domain.ApplyField;
-import team.ohjj.momo.domain.ApplyFieldList;
-import team.ohjj.momo.domain.Project;
-import team.ohjj.momo.domain.User;
+import team.ohjj.momo.domain.*;
 import team.ohjj.momo.entity.ApplyFieldJpaRepository;
+import team.ohjj.momo.entity.MemberJpaRepository;
 import team.ohjj.momo.entity.ProjectRepository;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = "/api/project")
@@ -24,31 +19,47 @@ public class ProjectRestController {
 	@Autowired
 	ApplyFieldJpaRepository applyFieldJpaRepository;
 
+	@Autowired
+	MemberJpaRepository memberJpaRepository;
+
 	@GetMapping("/count")
 	public Integer getProjectCount() {
 		return (int)projectRepository.count();
 	}
 
 	@GetMapping("/list/{pageNo}")
-	public List<Project> getProjectList(@PathVariable Integer pageNo) {
+	public List<Map<String, Object>> getProjectList(@PathVariable Integer pageNo) {
 		Integer unitCount = 10;
 		List<Project> allProject = projectRepository.findAll();
 		List<Project> partProject = new ArrayList<>();
+		List<Map<String, Object>> result = new ArrayList<>();
 
 		try {
-			for (int i = unitCount * (pageNo - 1); i < unitCount * pageNo; i++) {
+			int endPage = unitCount * pageNo;
+			for (int i = endPage - 10; i < (allProject.size() < endPage ? allProject.size() : endPage); i++) {
+				Map<String, Object> projectObj = new HashMap<>();
 				partProject.add(allProject.get(i));
 				Project presentProject = partProject.get(i - unitCount * (pageNo - 1));
+
+				List<ApplyField> applyFieldList = applyFieldJpaRepository.findAllByProject(presentProject);
+				List<Member> memberList = memberJpaRepository.findAllByProject(presentProject);
+
 				if (presentProject.getContent().length() > 20) {
 					presentProject.setContent(presentProject.getContent().substring(0, 20) + "...");
 				}
+
+				projectObj.put("project", presentProject);
+				projectObj.put("applyFields", applyFieldList);
+				projectObj.put("members", memberList);
+				result.add(projectObj);
 			}
 		}
 		catch (Exception e) {
 			System.out.println(e);
+			e.printStackTrace();
 		}
 
-		return partProject;
+		return result;
 	}
 
 	@GetMapping("/{no}")
@@ -59,15 +70,20 @@ public class ProjectRestController {
 	}
 
 	@PostMapping("/insert")
-	public Integer createProject(HttpSession session, @ModelAttribute Project project, @ModelAttribute ApplyFieldList applyFields) {
+	public Integer createProject(HttpSession session, @ModelAttribute Project project, @ModelAttribute ApplyFieldList applyFields, @ModelAttribute Member member) {
 		User user = (User)session.getAttribute("user");
 
 		project.setOrganizer(user);
 		project = projectRepository.save(project);
 
+		member.setProject(project);
 		for (ApplyField applyField : applyFields.getApplyFieldList()) {
 			applyField.setProject(project);
 			applyFieldJpaRepository.save(applyField);
+			if (applyField.getField().equals(member.getField())) {
+				member.setField(applyField);
+				memberJpaRepository.save(member);
+			}
 		}
 
 		return project.getNo();

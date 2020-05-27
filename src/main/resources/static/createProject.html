@@ -81,6 +81,13 @@
             </div>
         </div>
 
+        <div class="container input-group input-group-lg">
+            <h4><b>본인의 역할</b></h4>
+            <div class="col-sm-3">
+                <input type="text" name="field" id="myFieldTxt" placeholder="직군">
+            </div>
+        </div>
+
         <div class="container input-group">
             <h4><b>기간</b></h4>
             <div class="col-sm-3">
@@ -121,6 +128,7 @@
 	const cancelBtn = $('#cancelBtn');
 	const titleTxt = $('#titleTxt');
 	const contentTxt = $('#contentTxt');
+	const myFieldTxt = $('#myFieldTxt');
 
 	$.ajax({
 		type: 'get',
@@ -162,14 +170,18 @@
 
 	createBtn.on('click', () => {
 		// 프로젝트 생성
-		if (titleTxt.val() == '') {
+		if (!titleTxt.val()) {
 			alert('프로젝트 제목을 입력해주세요.');
 		}
-		else if (contentTxt.val() == '') {
+		else if (!contentTxt.val()) {
 			alert('프로젝트 내용을 입력해주세요.');
 		}
+        else if (!myFieldTxt.val()) {
+            alert('본인의 역할을 입력해주세요.');
+        }
 		else {
 			let valid = true;
+			let fieldValid = false;
 			for (let i = 0; i < fields.length; i++) {
 				let field = fields[i].children('input[type=text]');
 				let number = fields[i].children('input[type=number]');
@@ -186,6 +198,10 @@
 					valid = false;
 				}
 
+                if (myFieldTxt.val() == field.val()) {
+	                fieldValid = true;
+                }
+
 				if (!valid) {
 					break;
 				}
@@ -194,7 +210,7 @@
 				number.attr('name', `ApplyFieldList[${ i }].number`, number);
 			}
 
-			if (valid) {
+			if (valid && fieldValid) {
 				$.ajax({
 					type: 'post',
 					url: 'http://localhost:8080/api/project/insert',
