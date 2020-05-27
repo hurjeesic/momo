@@ -6,117 +6,6 @@
     <title>회원가입</title>
     <link rel="stylesheet" href="css/bootstrap.css">
 </head>
-<script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $('#emailBtn').click(function () {
-            if ($("#userEmail").val() == "") {
-                alert("이메일을 입력하지 않았습니다.");
-            } else {
-                $.ajax({
-                    type: "get",
-                    url: "http://localhost:8080/api/user/check/email",
-                    dataType: "json",
-                    data: {email: $("#userEmail").val()},
-                    success: function (data) {
-                        if (data) {
-                            alert("사용가능한 이메일입니다. 인증번호를 입력해주세요.");
-                            $.ajax({
-                                type: "get",
-                                url: "http://localhost:8080/api/user/confirm/email",
-                                data: {email: $("#userEmail").val()},
-                                async: false,
-                                success: function (data) {
-                                    if (data) {
-                                        alert("인증코드가 전송되었습니다.");
-                                    } else {
-                                        alert("인증코드 전송을 실패했습니다.");
-                                    }
-                                },
-                                error: function () {
-                                    alert("인증코드 전송 실패");
-
-                                }
-                            });
-                            $("#emailBtn").attr("disabled", "disabled");
-                        } else {
-                            alert("사용이 불가능한 이메일 입니다.");
-                        }
-                    },
-                    error: function () {
-                        alert("가입실패");
-                    }
-                });
-            }
-
-        });
-    });
-</script>
-<script>
-    $(document).ready(function () {
-        $('#emailCheck').click(function () {
-            $.ajax({
-                type: "get",
-                url: "",
-                data: {nickname: $("#userEmail").val()},
-                success: function (data) {
-                    alert("메일인증이 완료되었습니다..");
-                    $("#emailCheck").attr("disabled", "disabled");
-                },
-                error: function () {
-                    alert("인증코드가 틀렸습니다.");
-                }
-            });
-        });
-    });
-</script>
-<script>
-    $(document).ready(function () {
-        $('#nameCheck').click(function () {
-            if ($("#userName").val() == "") {
-                alert("닉네임을 입력하지 않았습니다.");
-            } else {
-                $.ajax({
-                    type: "get",
-                    url: "http://localhost:8080/api/user/check/nickname",
-                    data: {nickname: $("#userName").val()},
-                    success: function (data) {
-                        alert("사용가능한 닉네임입니다.");
-                        $("#nameCheck").attr("disabled", "disabled");
-                    },
-                    error: function () {
-                        alert("사용불가능한 닉네임입니다.");
-                    }
-                });
-            }
-        });
-    });
-</script>
-<script>
-    $(document).ready(function () {
-        $('#signUp').click(function () {
-            if ($('#userPw').val() == $('#userPwCheck').val()) {
-                $.ajax({
-                    type: "put",
-                    url: "http://localhost:8080/api/user/insert",
-                    data: {
-                        email: $("#userEmail").val(), password: $("#userPw").val(),
-                        nickname: $("#userName").val(), phone: $("#userPhone").val()
-                    },
-                    success: function (data) {
-                        console.log("성공")
-                        alert("회원가입 성공");
-                    },
-                    error: function () {
-                        alert("회원가입 실패");
-                    }
-                });
-            } else {
-                alert("비밀번호가 틀렸습니다.");
-            }
-        });
-    });
-</script>
 <body>
 <nav class="navbar navbar-default">
     <div class="container-fluid">
@@ -133,51 +22,52 @@
         </div>
     </div>
 </nav>
-<div class="container ">
+<div class="container">
     <form class="navbar-form navbar-left">
         <div class="container input-group input-group-lg">
             <h4><b>이메일</b></h4>
             <div class="col-lg-6">
-                <input type="text" class="form-control" placeholder="@example.com" id="userEmail">
+                <input type="email" class="form-control" placeholder="@example.com" id="emailTxt">
                 <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button" id="emailBtn">인증코드 보내기</button>
+                    <button type="button" class="btn btn-primary" id="emailBtn">중복확인</button>
                 </span>
             </div><!-- /.col-sm-6 -->
         </div>
         <div class="container input-group input-group-lg">
             <div class="col-sm-6">
-                <input type="text" class="form-control" placeholder="인증코드">
+                <input type="text" class="form-control" id="codeTxt" placeholder="인증코드">
                 <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button" id="emailCheck">확인</button>
+                    <button type="button" class="btn btn-primary" id="codeCheckBtn">확인</button>
                 </span>
             </div><!-- /.col-sm-6 -->
         </div>
         <div class="container input-group input-group-lg">
             <h4><b>비밀번호</b></h4>
             <div class="col-sm-3">
-                <input type="text" class="form-control" placeholder="비밀번호" id="userPw">
-                <input type="text" class="form-control" placeholder="비밀번호 확인" id="userPwCheck">
+                <input type="password" class="form-control" placeholder="비밀번호" id="pwdTxt">
+                <input type="password" class="form-control" placeholder="비밀번호 확인" id="pwdCheckTxt">
             </div><!-- /.col-sm-6 -->
         </div>
         <div class="container input-group input-group-lg">
             <h4><b>닉네임</b></h4>
             <div class="col-sm-6">
-                <input type="text" class="form-control" placeholder="홍길동" id="userName">
+                <input type="text" class="form-control" placeholder="홍길동" id="nicknameTxt">
                 <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button" id="nameCheck">중복확인</button>
+                    <button type="button" class="btn btn-primary" id="nicknameCheckBtn">중복확인</button>
                 </span>
+                <input type="hidden" id="checkNickname">
             </div><!-- /.col-sm-6 -->
         </div>
         <div class="container input-group input-group-lg">
             <h4><b>전화번호</b></h4>
             <div class="col-sm-6">
-                <input type="text" class="form-control" placeholder="@example.com" id="userPhone">
+                <input type="tel" class="form-control" id="phoneTxt" placeholder="010-xxxx-xxxx">
             </div><!-- /.col-sm-6 -->
         </div>
         <div class="container input-group input-group-lg">
             <div class="row">
                 <div class="col text-center">
-                    <button class="btn btn-primary btn-lg" id="signUp">회원가입</button>
+                    <button type="button" class="btn btn-primary btn-lg" id="signUpBtn">회원가입</button>
                 </div>
             </div>
         </div>
@@ -186,5 +76,178 @@
 
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script src="js/bootstrap.js"></script>
+<script>
+	const emailTxt = $('#emailTxt');
+	const emailBtn = $('#emailBtn');
+	const pwdTxt = $('#pwdTxt');
+	const pwdCheckTxt = $('#pwdCheckTxt');
+	const codeTxt = $('#codeTxt');
+	const codeCheckBtn = $('#codeCheckBtn');
+	const nicknameTxt = $('#nicknameTxt');
+	const nicknameCheckBtn = $('#nicknameCheckBtn');
+	const checkNickname = $('#checkNickname');
+	const phoneTxt = $('#phoneTxt');
+	const signUpBtn = $('#signUpBtn');
+
+	codeTxt.attr('disabled', true);
+	codeCheckBtn.attr('disabled', true);
+	checkNickname.val(false);
+
+	emailBtn.on('click', () => {
+		if (emailTxt.val() == '') {
+			alert('이메일을 입력해주세요.');
+			emailTxt.focus();
+		}
+		else {
+			const emailExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
+
+			if (emailExp.test(emailTxt.val())) {
+				$.ajax({
+					type: 'get',
+					url: 'http://localhost:8080/api/user/check/email',
+					dataType: 'json',
+					data: { email: emailTxt.val() },
+					async: false,
+					success: (data) => {
+						if (data) {
+							$.ajax({
+								type: 'get',
+								url: 'http://localhost:8080/api/user/confirm/email',
+								data: { email: emailTxt.val() },
+								async: false,
+								success: () => {
+									alert('인증코드가 전송되었습니다.');
+
+									emailTxt.attr('disabled', true);
+									emailBtn.attr('disabled', true);
+									codeTxt.attr('disabled', false);
+									codeCheckBtn.attr('disabled', false);
+
+									codeTxt.focus();
+								},
+								error: () => {
+									alert('인증코드를 전송하지 못하였습니다.');
+								}
+							});
+						}
+						else {
+							alert('이미 존재하는 이메일입니다.');
+							emailTxt.val('');
+							emailTxt.focus();
+						}
+					},
+					error: () => {
+						console.log('spring boot exception');
+					}
+				});
+			}
+			else {
+				alert('올바르지 않은 이메일 형식입니다.\n다시 입력하여 주시기 바랍니다.');
+				emailTxt.val('');
+				emailTxt.focus();
+			}
+		}
+	});
+
+	codeCheckBtn.on('click', () => {
+		if (codeTxt.val() == '') {
+			alert('인증 코드를 입력해주세요.');
+			codeTxt.focus();
+		}
+		else {
+			$.ajax({
+				type: 'get',
+				url: 'http://localhost:8080/api/user/confirm/email/check',
+				data: { code: codeTxt.val() },
+				async: false,
+				success: (data) => {
+					if (data) {
+						alert('메일인증이 완료되었습니다.');
+						codeTxt.attr('disabled', true);
+						codeCheckBtn.attr('disabled', true);
+					}
+					else {
+						alert('인증코드가 올바르지 않습니다.');
+						codeTxt.val('');
+						codeTxt.focus();
+					}
+				},
+				error: () => {
+					alert('이메일 중복 체크를 해주세요.');
+					emailTxt.focus();
+				}
+			});
+		}
+	});
+
+	nicknameCheckBtn.on('click', () => {
+		if (nicknameTxt.val() == '') {
+			alert('닉네임을 입력해주세요.');
+			nicknameTxt.focus();
+		}
+		else {
+			$.ajax({
+				type: 'get',
+				url: 'http://localhost:8080/api/user/check/nickname',
+				data: { nickname: nicknameTxt.val() },
+				async: false,
+				success: (data) => {
+					if (data) {
+						alert('사용 가능한 닉네임입니다.');
+						nicknameTxt.attr('disabled', true);
+						nicknameCheckBtn.attr('disabled', true);
+						checkNickname.val(true);
+						phoneTxt.focus();
+					}
+					else {
+						alert('이미 존재하는 닉네임입니다.');
+						nicknameTxt.val('');
+						nicknameTxt.focus();
+					}
+				},
+				error: () => {
+					console.log('spring boot exception');
+				}
+			});
+		}
+	});
+
+	signUpBtn.on('click', () => {
+		if (emailTxt.val() == '') {
+			alert('이메일을 입력해주세요.');
+		}
+		else if (pwdTxt.val() == '') {
+			alert('비밀번호를 입력해주세요.');
+		}
+		else if (pwdTxt.val() != pwdCheckTxt.val()) {
+			alert('비밀번호와 비밀번호 확인이 다릅니다.');
+		}
+		else if (checkNickname.val() == 'false') {
+			alert('닉네임을 검증해주세요.');
+		}
+		else {
+			$.ajax({
+				type: 'post',
+				url: 'http://localhost:8080/api/user/insert',
+				data: {
+					email: emailTxt.val(), password: pwdTxt.val(),
+					nickname: nicknameTxt.val(), phone: phoneTxt.val()
+				},
+				success: (data) => {
+					if (data) {
+						alert('회원가입 성공하였습니다.');
+						window.location = './signIn.html';
+					}
+					else {
+						alert('이메일 검증을 완료해주세요.');
+					}
+				},
+				error: () => {
+					alert('회원가입 실패하였습니다.');
+				}
+			});
+		}
+	});
+</script>
 </body>
 </html>
