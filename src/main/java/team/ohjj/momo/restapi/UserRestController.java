@@ -28,17 +28,16 @@ public class UserRestController {
     public Integer login(HttpSession session, @ModelAttribute User user) {
         user = userRepository.findByEmailAndPasswordAndType(user.getEmail(), user.getPassword(), user.getType()).get();
 
+        session.invalidate();
         session.setMaxInactiveInterval(10 * minute);
         session.setAttribute("user", user);
 
         return user.getNo();
     }
 
-    @GetMapping("/{id}")
-    public User getUserInfo(@PathVariable Integer id) {
-        Optional<User> user = userRepository.findById(id);
-
-        return user.isPresent() ? user.get() : null;
+    @GetMapping("/")
+    public User getUserInfo(HttpSession session) {
+        return (User)session.getAttribute("user");
     }
 
     @PostMapping("/insert")

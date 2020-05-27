@@ -62,50 +62,51 @@
 </div>
 
 <div>
-    <div class="container input-group input-group-lg">
-        <h4><b>프로젝트 제목</b></h4>
-        <div class="col-sm-6">
-            <input type="text" class="form-control" id="titleTxt">
-        </div>
-    </div>
-
-    <div class="container input-group input-group-lg" id="employees">
-        <h4><b>인원</b></h4>
-        <div class="col-sm-6 input-group">
-            <input type="text" placeholder="직군">
-            <input type="number" min="1" placeholder="인원 수">
-            <button type="button" class="icon-btn" id="fieldAddBtn">
-                <div class="fas fa-plus-circle"/>
-            </button>
-        </div>
-    </div>
-
-    <div class="container input-group">
-        <h4><b>기간</b></h4>
-        <div class="col-sm-3">
-            <input type="date" id="startDate">
-            <input type="date" id="endDate">
-        </div>
-    </div>
-
-    <div class="container input-group input-group-lg">
-        <h4><b>세부내용</b></h4>
-        <div class="col-sm-6">
-            <input type="text" class="form-control" id="contentTxt">
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="">
-            <div class="text-center">
-                <button class="btn btn-primary btn-lg" id="createBtn">생성</button>
-            </div>
-            <div class="text-center">
-                <button class="btn btn-primary btn-lg" id="cancelBtn">취소</button>
+    <form>
+        <div class="container input-group input-group-lg">
+            <h4><b>프로젝트 제목</b></h4>
+            <div class="col-sm-6">
+                <input type="text" name="title" class="form-control" id="titleTxt">
             </div>
         </div>
-    </div>
 
+        <div class="container input-group input-group-lg" id="employees">
+            <h4><b>인원</b></h4>
+            <div class="col-sm-6 input-group">
+                <input type="text" placeholder="직군">
+                <input type="number" min="1" placeholder="인원 수">
+                <button type="button" class="icon-btn" id="fieldAddBtn">
+                    <div class="fas fa-plus-circle"/>
+                </button>
+            </div>
+        </div>
+
+        <div class="container input-group">
+            <h4><b>기간</b></h4>
+            <div class="col-sm-3">
+                <input type="date" id="startDate">
+                <input type="date" id="endDate">
+            </div>
+        </div>
+
+        <div class="container input-group input-group-lg">
+            <h4><b>세부내용</b></h4>
+            <div class="col-sm-6">
+                <input type="text" name="content" class="form-control" id="contentTxt">
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="">
+                <div class="text-center">
+                    <button type="button" class="btn btn-primary btn-lg" id="createBtn">생성</button>
+                </div>
+                <div class="text-center">
+                    <button type="button" class="btn btn-primary btn-lg" id="cancelBtn">취소</button>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="js/bootstrap.js"></script>
@@ -114,9 +115,27 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
 <script>
 	const employees = $('#employees');
-	const fields = [$('#field-group1')];
+	const fields = [employees.children(':last')];
 	const fieldAddBtn = $('#fieldAddBtn');
-	
+	const createBtn = $('#createBtn');
+	const cancelBtn = $('#cancelBtn');
+	const titleTxt = $('#titleTxt');
+	const contentTxt = $('#contentTxt');
+
+	$.ajax({
+		type: 'get',
+		url: 'http://localhost:8080/api/user/',
+		dataType: 'json',
+		async: false,
+		success: (data) => {
+			// 받은 유저 정보를 출력
+		},
+		error: () => {
+			alert('세션이 만료되었습니다.');
+			window.location = './signIn.html';
+		}
+	});
+
 	fieldAddBtn.on('click', () => {
 		employees.append(`<div class="col-sm-6 input-group">` +
 			`<input type="text" placeholder="직군"><input type="number" min="1" placeholder="인원 수"></div>`);
@@ -139,6 +158,64 @@
 			fields.splice(fields.indexOf(this), 1);
 			addedObj.remove();
 		});
+	});
+
+	createBtn.on('click', () => {
+		// 프로젝트 생성
+		if (titleTxt.val() == '') {
+			alert('프로젝트 제목을 입력해주세요.');
+		}
+		else if (contentTxt.val() == '') {
+			alert('프로젝트 내용을 입력해주세요.');
+		}
+		else {
+			let valid = true;
+			for (let i = 0; i < fields.length; i++) {
+				let field = fields[i].children('input[type=text]');
+				let number = fields[i].children('input[type=number]');
+				if (!field.val()) {
+					alert('모든 직군을 적어주세요.');
+					valid = false;
+				}
+				else if (!number.val()) {
+					alert('각 직군에 따른 인원 수를 적어주세요.');
+					valid = false;
+				}
+				else if (isNaN(Number(number.val()))) {
+					alert('인원 수에는 숫자만 가능합니다.');
+					valid = false;
+				}
+
+				if (!valid) {
+					break;
+				}
+
+				field.attr('name', `ApplyFieldList[${ i }].field`, field);
+				number.attr('name', `ApplyFieldList[${ i }].number`, number);
+			}
+
+			if (valid) {
+				$.ajax({
+					type: 'post',
+					url: 'http://localhost:8080/api/project/insert',
+					dataType: 'json',
+					data: $('form').serializeArray(),
+					async: false,
+					success: (data) => {
+						alert('프로젝트가 생성되었습니다.');
+						window.location = './index.html';
+					},
+					error: () => {
+						alert('세션이 만료되었습니다.');
+						window.location = './signIn.html';
+					}
+				});
+			}
+		}
+	});
+
+	cancelBtn.on('click', () => {
+		window.location = './index.html';
 	});
 </script>
 </body>

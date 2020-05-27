@@ -1,8 +1,8 @@
 package team.ohjj.momo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -14,11 +14,11 @@ public class ApplyField {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty
-    private Integer no;
+    private int no;
 
     @JoinColumn(name = "project", nullable = false)
     @ManyToOne(targetEntity = Project.class)
-    @JsonProperty
+    @JsonIgnore
     private Project project;
 
     @Column(nullable = false)
@@ -27,7 +27,7 @@ public class ApplyField {
 
     @Column(nullable = false)
     @JsonProperty
-    private Integer number;
+    private int number;
 
     @Override
     public String toString() {
