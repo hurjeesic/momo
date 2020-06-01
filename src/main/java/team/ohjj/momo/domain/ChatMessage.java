@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Calendar;
+import java.util.Date;
 
 @Entity
 @Table(name = "chat_message")
@@ -13,7 +13,7 @@ import java.util.Calendar;
 @Setter
 public class ChatMessage {
     @Id
-    @Column(nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty
     private Integer no;
 
@@ -37,5 +37,17 @@ public class ChatMessage {
 
     @Column(name = "send_time")
     @JsonProperty
-    private Calendar sendTime;
+    private Date sendTime;
+
+    @Override
+    public String toString() {
+        return "ChatMessage{" +
+                "no=" + no +
+                ", type=" + type +
+                ", room=" + room.toString() +
+                ", sender=" + sender.toString() +
+                ", message='" + message + '\'' +
+                ", sendTime=" + sendTime +
+                '}';
+    }
 }

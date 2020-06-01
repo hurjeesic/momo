@@ -8,77 +8,78 @@ import java.io.Serializable;
 
 @Entity
 public class User implements Serializable {
-    private static final long serialVersionUID = 6494678977089006639L;
+	private static final long serialVersionUID = 6494678977089006639L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonProperty
-    private int no;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@JsonIgnore
+	private int no;
 
-    @Column(unique = true, nullable = false)
-    @JsonProperty
-    private String email;
+	@Column(unique = true, nullable = false)
+	@JsonProperty
+	private String email;
 
-    @JsonIgnore
-    @Column(nullable = false)
-    private String password;
+	@Column(nullable = false)
+	@JsonIgnore
+	private String password;
 
-    @Column(unique = true, nullable = false)
-    @JsonProperty
-    private String nickname;
+	@Column(unique = true, nullable = false)
+	@JsonProperty
+	private String nickname;
 
-    @JsonProperty
-    private String phone;
+	@JsonProperty
+	private String phone;
 
-    @JsonIgnore
-    @Column(nullable = false)
-    private byte type;
 
-    public int getNo() {
-        return no;
-    }
+	@Column(nullable = false)
+	@JsonIgnore
+	private byte type;
 
-    public void setNo(int no) {
-        this.no = no;
-    }
+	public int getNo() {
+		return no;
+	}
 
-    public String getEmail() {
-        return email;
-    }
+	public void setNo(int no) {
+		this.no = no;
+	}
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+	public String getEmail() {
+		return email;
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+	public String getPassword() {
+		return password;
+	}
 
-    public String getNickname() {
-        return nickname;
-    }
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
+	public String getNickname() {
+		return nickname;
+	}
 
-    public String getPhone() {
-        return phone;
-    }
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+	public String getPhone() {
+		return phone;
+	}
 
-    public byte getType() {
-        return type;
-    }
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
 
-    public void setType(byte type) {
-        this.type = type;
-    }
+	public byte getType() {
+		return type;
+	}
+
+	public void setType(byte type) {
+		this.type = type;
+	}
 }
