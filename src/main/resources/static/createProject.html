@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width" , initial-scale="1">
+    <title>프로젝트 생성</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <style type="text/css">
+        .jumbotron {
+            background-image: url('images/bonobono.jpg');
+            background-size: cover;
+            text-shadow: black 0.2em 0.2em 0.2em;
+            color: white;
+        }
+
+        .dropdown:hover > .dropdown-menu {
+            display: block;
+        }
+
+        .icon-btn {
+            border: 0;
+            outline: 0;
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed"
+                    data-toggle="collapse" data-target="#bs-example-navber-collapse-1"
+                    aria-expanded="false">
+                <span class="sr-only"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="">모여모여게시판</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="">포트폴리오 <span class="sr-only"></span></a></li>
+                <li class="active"><a href="">게시판 <span class="sr-only"></span></a></li>
+                <li class="active"><a href="">기업진 <span class="sr-only"></span></a></li>
+            </ul>
+            <form class="navbar-form navbar-left">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="내용을 입력하세요">
+                </div>
+                <button type="submit" class="btn btn-default">검색</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="jumbotron">
+        <h1 class="text-center">모모게시판</h1>
+        <p class="text-center"> 프로젝트의 거대한 도우미</p>
+    </div>
+</div>
+
+<div>
+    <form>
+        <div class="container input-group input-group-lg">
+            <h4><b>프로젝트 제목</b></h4>
+            <div class="col-sm-6">
+                <input type="text" name="title" class="form-control" id="titleTxt">
+            </div>
+        </div>
+
+        <div class="container input-group input-group-lg" id="employees">
+            <h4><b>인원</b></h4>
+            <div class="col-sm-6 input-group">
+                <input type="text" placeholder="직군">
+                <input type="number" min="1" placeholder="인원 수">
+                <button type="button" class="icon-btn" id="fieldAddBtn">
+                    <div class="fas fa-plus-circle"/>
+                </button>
+            </div>
+        </div>
+
+        <div class="container input-group input-group-lg">
+            <h4><b>본인의 역할</b></h4>
+            <div class="col-sm-3">
+                <input type="text" name="field" id="myFieldTxt" placeholder="직군">
+            </div>
+        </div>
+
+        <div class="container input-group">
+            <h4><b>기간</b></h4>
+            <div class="col-sm-3">
+                <input type="date" id="startDate">
+                <input type="date" id="endDate">
+            </div>
+        </div>
+
+        <div class="container input-group input-group-lg">
+            <h4><b>세부내용</b></h4>
+            <div class="col-sm-6">
+                <input type="text" name="content" class="form-control" id="contentTxt">
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="">
+                <div class="text-center">
+                    <button type="button" class="btn btn-primary btn-lg" id="createBtn">생성</button>
+                </div>
+                <div class="text-center">
+                    <button type="button" class="btn btn-primary btn-lg" id="cancelBtn">취소</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="js/bootstrap.js"></script>
+<script src='https://kit.fontawesome.com/a076d05399.js'></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+<script>
+	const employees = $('#employees');
+	const fields = [employees.children(':last')];
+	const fieldAddBtn = $('#fieldAddBtn');
+	const createBtn = $('#createBtn');
+	const cancelBtn = $('#cancelBtn');
+	const titleTxt = $('#titleTxt');
+	const contentTxt = $('#contentTxt');
+	const myFieldTxt = $('#myFieldTxt');
+
+	$.ajax({
+		type: 'get',
+		url: 'http://localhost:8080/api/user/',
+		dataType: 'json',
+		async: false,
+		success: (data) => {
+			// 받은 유저 정보를 출력
+		},
+		error: () => {
+			alert('세션이 만료되었습니다.');
+			window.location = './signIn.html';
+		}
+	});
+
+	fieldAddBtn.on('click', () => {
+		employees.append(`<div class="col-sm-6 input-group">` +
+			`<input type="text" placeholder="직군"><input type="number" min="1" placeholder="인원 수"></div>`);
+		fields.push(employees.children(':last'));
+		const addedObj = fields[fields.length - 1];
+		addedObj.children(':last').after(fieldAddBtn);
+
+		fieldAddBtn.after(`<button type="button" class="icon-btn"><div class="fas fa-minus-circle"/></button>`);
+
+		addedObj.children(':last').on('click', () => {
+			if (addedObj == fields[fields.length - 1]) {
+				if (fields.length > 2) {
+					fields[fields.length - 2].children(':last').before(fieldAddBtn);
+				}
+				else {
+					fields[fields.length - 2].children(':last').after(fieldAddBtn);
+				}
+			}
+
+			fields.splice(fields.indexOf(this), 1);
+			addedObj.remove();
+		});
+	});
+
+	createBtn.on('click', () => {
+		// 프로젝트 생성
+		if (!titleTxt.val()) {
+			alert('프로젝트 제목을 입력해주세요.');
+		}
+		else if (!contentTxt.val()) {
+			alert('프로젝트 내용을 입력해주세요.');
+		}
+        else if (!myFieldTxt.val()) {
+            alert('본인의 역할을 입력해주세요.');
+        }
+		else {
+			let valid = true;
+			let fieldValid = false;
+			for (let i = 0; i < fields.length; i++) {
+				let field = fields[i].children('input[type=text]');
+				let number = fields[i].children('input[type=number]');
+				if (!field.val()) {
+					alert('모든 직군을 적어주세요.');
+					valid = false;
+				}
+				else if (!number.val()) {
+					alert('각 직군에 따른 인원 수를 적어주세요.');
+					valid = false;
+				}
+				else if (isNaN(Number(number.val()))) {
+					alert('인원 수에는 숫자만 가능합니다.');
+					valid = false;
+				}
+
+                if (myFieldTxt.val() == field.val()) {
+	                fieldValid = true;
+                }
+
+				if (!valid) {
+					break;
+				}
+
+				field.attr('name', `ApplyFieldList[${ i }].field`, field);
+				number.attr('name', `ApplyFieldList[${ i }].number`, number);
+			}
+
+			if (valid) {
+				if (fieldValid) {
+					$.ajax({
+						type: 'post',
+						url: 'http://localhost:8080/api/project/insert',
+						dataType: 'json',
+						data: $('form').serializeArray(),
+						async: false,
+						success: (data) => {
+							alert('프로젝트가 생성되었습니다.');
+							window.location = './index.html';
+						},
+						error: () => {
+							alert('세션이 만료되었습니다.');
+							window.location = './signIn.html';
+						}
+					});
+				}
+                else {
+					alert('본인의 역할은 전체 역할 내에 있어야합니다.');
+					myFieldTxt.focus();
+				}
+			}
+		}
+	});
+
+	cancelBtn.on('click', () => {
+		window.location = './index.html';
+	});
+</script>
+</body>
+</html>
