@@ -4,90 +4,82 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonProperty
-    private int no;
+public class User implements Serializable {
+	private static final long serialVersionUID = 6494678977089006639L;
 
-    @Column(unique = true, nullable = false)
-    @JsonProperty
-    private String email;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@JsonIgnore
+	private int no;
 
-    @JsonIgnore
-    @Column(nullable = false)
-    private String password;
+	@Column(unique = true, nullable = false)
+	@JsonProperty
+	private String email;
 
-    @Column(unique = true, nullable = false)
-    @JsonProperty
-    private String nickname;
+	@Column(nullable = false)
+	@JsonIgnore
+	private String password;
 
-    @JsonProperty
-    private String phone;
+	@Column(unique = true, nullable = false)
+	@JsonProperty
+	private String nickname;
 
-    @JsonIgnore
-    @Column(nullable = false)
-    private byte type;
+	@JsonProperty
+	private String phone;
 
-    public int getNo() {
-        return no;
-    }
 
-    public void setNo(int no) {
-        this.no = no;
-    }
+	@Column(nullable = false)
+	@JsonIgnore
+	private byte type;
 
-    public String getEmail() {
-        return email;
-    }
+	public int getNo() {
+		return no;
+	}
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+	public void setNo(int no) {
+		this.no = no;
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public String getEmail() {
+		return email;
+	}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
-    public String getNickname() {
-        return nickname;
-    }
+	public String getPassword() {
+		return password;
+	}
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
-    public String getPhone() {
-        return phone;
-    }
+	public String getNickname() {
+		return nickname;
+	}
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
 
-    public byte getType() {
-        return type;
-    }
+	public String getPhone() {
+		return phone;
+	}
 
-    public void setType(byte type) {
-        this.type = type;
-    }
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "no=" + no +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", nickname='" + nickname + '\'' +
-                ", phone='" + phone + '\'' +
-                ", type=" + type +
-                '}';
-    }
+	public byte getType() {
+		return type;
+	}
+
+	public void setType(byte type) {
+		this.type = type;
+	}
 }

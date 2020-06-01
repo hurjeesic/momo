@@ -4,8 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import team.ohjj.momo.domain.*;
 import team.ohjj.momo.entity.ApplyFieldJpaRepository;
+import team.ohjj.momo.entity.ChatRoomRepository;
 import team.ohjj.momo.entity.MemberJpaRepository;
-import team.ohjj.momo.entity.ProjectRepository;
+import team.ohjj.momo.entity.ProjectJpaRepository;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
@@ -14,7 +15,7 @@ import java.util.*;
 @RequestMapping(value = "/api/project")
 public class ProjectRestController {
 	@Autowired
-	ProjectRepository projectRepository;
+	ProjectJpaRepository projectJpaRepository;
 
 	@Autowired
 	ApplyFieldJpaRepository applyFieldJpaRepository;
@@ -22,15 +23,19 @@ public class ProjectRestController {
 	@Autowired
 	MemberJpaRepository memberJpaRepository;
 
+	@Autowired
+	ChatRoomRepository chatRoomRepository;
+
+	private final Integer unitCount = 10;
+
 	@GetMapping("/count")
 	public Integer getProjectCount() {
-		return (int)projectRepository.count();
+		return (int)projectJpaRepository.count();
 	}
 
 	@GetMapping("/list/{pageNo}")
 	public List<Map<String, Object>> getProjectList(@PathVariable Integer pageNo) {
-		Integer unitCount = 10;
-		List<Project> allProject = projectRepository.findAll();
+		List<Project> allProject = projectJpaRepository.findAll();
 		List<Project> partProject = new ArrayList<>();
 		List<Map<String, Object>> result = new ArrayList<>();
 
@@ -64,9 +69,7 @@ public class ProjectRestController {
 
 	@GetMapping("/{no}")
 	public Project getProject(@PathVariable Integer no) {
-		Optional<Project> project = projectRepository.findById(no);
-
-		return project.isPresent() ? project.get() : null;
+		return projectJpaRepository.findById(no).get();
 	}
 
 	@PostMapping("/insert")
@@ -74,7 +77,7 @@ public class ProjectRestController {
 		User user = (User)session.getAttribute("user");
 
 		project.setOrganizer(user);
-		project = projectRepository.save(project);
+		project = projectJpaRepository.save(project);
 
 		Member member = new Member();
 		member.setUser(user);
@@ -88,12 +91,14 @@ public class ProjectRestController {
 			}
 		}
 
+		chatRoomRepository.createChatRoom("일반", project.getNo());
+
 		return project.getNo();
 	}
 
 	@PutMapping("/update")
 	public Integer updateProject(@ModelAttribute Project project) {
-		Project updatedProject = projectRepository.save(project);
+		Project updatedProject = projectJpaRepository.save(project);
 
 		return updatedProject == null ? 0 : updatedProject.getNo();
 	}
@@ -106,8 +111,8 @@ public class ProjectRestController {
 		if (user == null) {
 			result = 0;
 		}
-		else if (projectRepository.findById(no).get().getOrganizer().equals(user)) {
-			projectRepository.deleteById(no);
+		else if (projectJpaRepository.findById(no).get().getOrganizer().equals(user)) {
+			projectJpaRepository.deleteById(no);
 			result = no;
 		}
 

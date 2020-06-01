@@ -1,11 +1,10 @@
 package team.ohjj.momo;
 
-import org.hamcrest.core.IsNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import team.ohjj.momo.domain.User;
-import team.ohjj.momo.entity.UserRepository;
+import team.ohjj.momo.entity.UserJpaRepository;
 
 
 import java.util.Optional;
@@ -16,7 +15,7 @@ import static org.hamcrest.core.Is.is;
 @SpringBootTest
 class UserTests {
     @Autowired
-    UserRepository userRepository;
+    UserJpaRepository userJpaRepository;
 
     private Integer id = 1;
     private String email = "test1@gmail.com";
@@ -27,7 +26,7 @@ class UserTests {
 
     @Test
     public void getUser() {
-        User user = userRepository.findById(id).get();
+        User user = userJpaRepository.findById(id).get();
 
         assertThat(user.getEmail(), is(email));
         assertThat(user.getPassword(), is(password));
@@ -46,7 +45,7 @@ class UserTests {
         user.setPhone("010-5678-1234");
         user.setType((byte) 2);
 
-        User insertedUser = userRepository.save(user);
+        User insertedUser = userJpaRepository.save(user);
 
         assertThat(insertedUser.getEmail(), is(user.getEmail()));
         assertThat(insertedUser.getPassword(), is(user.getPassword()));
@@ -65,14 +64,14 @@ class UserTests {
         user.setPhone("010-1111-2222");
         user.setType((byte) 2);
 
-        user = userRepository.save(user);
+        user = userJpaRepository.save(user);
 
         Integer id = user.getNo();
-        user = userRepository.findById(id).get();
+        user = userJpaRepository.findById(id).get();
 
         user.setPassword("test5");
 
-        User updatedUser = userRepository.save(user);
+        User updatedUser = userJpaRepository.save(user);
 
         assertThat(updatedUser.getEmail(), is(user.getEmail()));
         assertThat(updatedUser.getPassword(), is(user.getPassword()));
@@ -91,12 +90,12 @@ class UserTests {
         user.setPhone("010-3853-2947");
         user.setType((byte) 2);
 
-        User insertedUser = userRepository.save(user);
+        User insertedUser = userJpaRepository.save(user);
 
         Integer id = insertedUser.getNo();
-        userRepository.deleteById(id);
+        userJpaRepository.deleteById(id);
 
-        Optional<User> deletedUser = userRepository.findById(id);
+        Optional<User> deletedUser = userJpaRepository.findById(id);
 
         assertThat(deletedUser.isPresent(), is(false));
     }

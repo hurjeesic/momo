@@ -1,13 +1,11 @@
 package team.ohjj.momo;
 
-import org.hamcrest.core.IsNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import team.ohjj.momo.domain.Project;
-import team.ohjj.momo.domain.User;
-import team.ohjj.momo.entity.ProjectRepository;
-import team.ohjj.momo.entity.UserRepository;
+import team.ohjj.momo.entity.ProjectJpaRepository;
+import team.ohjj.momo.entity.UserJpaRepository;
 
 import java.util.Optional;
 
@@ -17,9 +15,9 @@ import static org.hamcrest.core.Is.is;
 @SpringBootTest
 public class ProjectTests {
     @Autowired
-    ProjectRepository projectRepository;
+    ProjectJpaRepository projectJpaRepository;
     @Autowired
-    UserRepository userRepository;
+    UserJpaRepository userJpaRepository;
 
     private Integer id = 1;
     private String title = "test";
@@ -30,7 +28,7 @@ public class ProjectTests {
 
     @Test
     public void getProject() {
-        Project project = projectRepository.findById(id).get();
+        Project project = projectJpaRepository.findById(id).get();
 
         assertThat(project.getTitle(), is(title));
         assertThat(project.getContent(), is(content));
@@ -45,11 +43,11 @@ public class ProjectTests {
 
         project.setTitle("모여모여 게시판");
         project.setContent("대학생 프로젝트 관리를 위한 사이트 모여모여 게시판입니다.");
-        project.setOrganizer(userRepository.findById(id).get());
+        project.setOrganizer(userJpaRepository.findById(id).get());
         project.setProcess((byte) 1);
         project.setApply((byte) 1);
 
-        Project insertedProject = projectRepository.save(project);
+        Project insertedProject = projectJpaRepository.save(project);
 
         assertThat(insertedProject.getTitle(), is(project.getTitle()));
         assertThat(insertedProject.getContent(), is(project.getContent()));
@@ -64,19 +62,19 @@ public class ProjectTests {
 
         project.setTitle("모여모여 게시판");
         project.setContent("대학생 프로젝트 관리를 위한 사이트 모여모여 게시판입니다.");
-        project.setOrganizer(userRepository.findById(id).get());
+        project.setOrganizer(userJpaRepository.findById(id).get());
         project.setProcess((byte) 1);
         project.setApply((byte) 1);
 
-        project = projectRepository.save(project);
+        project = projectJpaRepository.save(project);
 
         Integer id = project.getNo();
-        project = projectRepository.findById(id).get();
+        project = projectJpaRepository.findById(id).get();
 
         project.setContent("# 모모 프로젝트\n" + project.getContent());
         project.setProcess((byte) 2);
 
-        Project updatedProject = projectRepository.save(project);
+        Project updatedProject = projectJpaRepository.save(project);
 
         assertThat(updatedProject.getTitle(), is(project.getTitle()));
         assertThat(updatedProject.getContent(), is(project.getContent()));
@@ -92,15 +90,15 @@ public class ProjectTests {
 
         project.setTitle("모여모여 게시판");
         project.setContent("대학생 프로젝트 관리를 위한 사이트 모여모여 게시판입니다.");
-        project.setOrganizer(userRepository.findById(id).get());
+        project.setOrganizer(userJpaRepository.findById(id).get());
         project.setProcess((byte) 1);
         project.setApply((byte) 1);
 
-        project = projectRepository.save(project);
+        project = projectJpaRepository.save(project);
 
-        projectRepository.deleteById(project.getNo());
+        projectJpaRepository.deleteById(project.getNo());
 
-        Optional<Project> deletedProject = projectRepository.findById(project.getNo());
+        Optional<Project> deletedProject = projectJpaRepository.findById(project.getNo());
 
         assertThat(deletedProject.isPresent(), is(false));
     }

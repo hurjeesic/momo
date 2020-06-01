@@ -21,12 +21,13 @@
         .dropdown:hover > .dropdown-menu {
             display: block;
         }
+
+        .list-group-item {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-<style type="text/css">
-
-</style>
 <nav class="navbar navbar-default">
     <div class="container-fluid">
         <div class="navbar-header">
@@ -42,9 +43,9 @@
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="">포트폴리오 <span class="sr-only"></span></a></li>
-                <li class="active"><a href="">게시판 <span class="sr-only"></span></a></li>
-                <li class="active"><a href="">기업진 <span class="sr-only"></span></a></li>
+                <li class="active"><a href="">포트폴리오<span class="sr-only"></span></a></li>
+                <li class="active"><a href="">게시판<span class="sr-only"></span></a></li>
+                <li class="active"><a href="">기업진<span class="sr-only"></span></a></li>
             </ul>
         </div>
     </div>
@@ -63,7 +64,7 @@
                 <div class="row">
                     <div class="col-12">
                         <h1>대화방</h1>
-                        <ul class="list-group">
+                        <ul class="list-group" id="chatRoomList">
                             <li class="list-group-item">전체 채팅</li>
                             <li class="list-group-item">개발부서</li>
                             <li class="list-group-item">디자인 부서</li>
@@ -71,7 +72,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
         <div class="col-sm-offset-1 col-sm-9">
             <h1>&nbsp;</h1>
@@ -83,7 +83,7 @@
                         <th class="col-md-9">내용</th>
                     </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="messageList">
                     <tr>
                         <td>고재우</td>
                         <td>우리 프로젝트의 미래는 어떻게 될까??</td>
@@ -98,17 +98,165 @@
                     </tr>
                     </tbody>
                 </table>
-                <input type="text">
-                <button>입력</button>
+                <input type="text" id="messageTxt">
+                <button type="button" id="sendBtn">입력</button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- JavaScript -->
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script src="js/bootstrap.js"></script>
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+
+<script src="/webjars/axios/0.17.1/dist/axios.min.js"></script>
+<script src="/webjars/sockjs-client/1.1.2/sockjs.min.js"></script>
+<script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
+<script>
+	// websocket & stomp initialize
+	let sock = new SockJS('/ws-stomp');
+	let ws = Stomp.over(sock);
+	let reconnect = 0;
+
+	const projectId = sessionStorage.getItem('project.id');
+	let roomId = sessionStorage.getItem('chat.room.id');
+	const chatRoomList = $('#chatRoomList');
+	const messageTxt = $('#messageTxt');
+	const messageList = $('#messageList');
+	const title = $('#title');
+	const sendBtn = $('#sendBtn');
+
+	$.ajax({
+		type: 'get',
+		url: 'http://localhost:8080/api/user/',
+		dataType: 'json',
+		async: false,
+		success: (data) => {
+			// 받은 유저 정보를 출력
+		},
+		error: () => {
+			alert('세션이 만료되었습니다.');
+			window.location = './signIn.html';
+		}
+	});
+
+	function findRoomList(projectId) {
+		$.ajax({
+			type: 'get',
+			url: '/api/chat/room/list',
+			dataType: 'json',
+			data: { projectId: projectId },
+			success: (response) => {
+				let count = 0;
+				if (roomId === null) {
+					roomId = response[0].id;
+				}
+
+				chatRoomList.empty();
+				response.map((room) => {
+					let className = 'list-group-item';
+					if (room.id == roomId) {
+						className += ' active'; // 추가할 class name
+					}
+					chatRoomList.append(`<li class="${ className }" id="room${ count }">${ room.name }</li>`);
+					$(`#room${ count }`).click(() => {
+						sessionStorage.setItem('chat.room.id', room.id);
+						location.reload();
+					});
+					count++;
+				});
+
+				findRoom(roomId);
+				findChatting(roomId);
+			},
+			error: () => {
+				alert('존재하지 않는 프로젝트입니다.');
+				window.location = './index.html';
+			}
+		});
+	}
+
+	function findRoom(roomId) {
+		$.ajax({
+			type: 'get',
+			url: `/api/chat/room/${ roomId }`,
+			dataType: 'json',
+			success: (response) => title.text(response.name)
+		});
+	}
+
+	function findChatting(roomId) {
+		$.ajax({
+			type: 'get',
+			url: `/api/chat/message/list/${ roomId }`,
+			dataType: 'json',
+			success: (response) => {
+				messageList.empty();
+				response.map((message) => {
+					messageList.append(`<tr><td>${ message.sender.nickname }</td><td>${ message.message }</td></tr>`);
+				});
+			}
+		});
+	}
+
+	function sendMessage(messageTxt) {
+		ws.send('/pub/chat/message', {}, JSON.stringify({
+			type: 'TALK',
+			room: { id: roomId },
+			message: messageTxt.val()
+		}));
+		messageTxt.val('');
+	}
+
+	function recvMessage(recv) {
+		if (recv.type == 'JOIN') {
+			// messageList.append(`<tr><td>[알림] ${recv.message}<td></tr>`);
+			// 사용자가 접속했을 때 받을 수 있도록 작동
+		}
+		else {
+			messageList.append(`<tr><td>${ recv.sender.nickname }</td><td>${ recv.message }<td></tr>`);
+		}
+	}
+
+	function connect() {
+		// pub/sub event
+		ws.connect({}, function (frame) {
+			ws.subscribe(`/sub/chat/room/${ roomId }`, function (message) {
+				let recv = JSON.parse(message.body);
+				recvMessage(recv);
+			});
+
+			ws.send('/pub/chat/message', {}, JSON.stringify({
+				type: 'JOIN',
+				room: { id: roomId }
+			}));
+		}, function (error) {
+			if (reconnect++ <= 5) {
+				setTimeout(function () {
+					console.log('connection reconnect');
+					sock = new SockJS('/ws-stomp');
+					ws = Stomp.over(sock);
+					connect();
+				}, 10 * 1000);
+			}
+			else {
+				alert('연결이 끊겼습니다.');
+				window.location = './index.html';
+			}
+		});
+	}
+
+	messageTxt.keydown((key) => {
+		if (key.keyCode == 13) {
+			sendMessage(messageTxt);
+		}
+	});
+	sendBtn.click(() => sendMessage(messageTxt));
+
+	findRoomList(projectId);
+	connect();
+</script>
 </body>
 </html>
