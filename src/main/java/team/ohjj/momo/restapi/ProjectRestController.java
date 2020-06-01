@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import team.ohjj.momo.domain.*;
 import team.ohjj.momo.entity.ApplyFieldJpaRepository;
+import team.ohjj.momo.entity.ChatRoomRepository;
 import team.ohjj.momo.entity.MemberJpaRepository;
 import team.ohjj.momo.entity.ProjectJpaRepository;
 
@@ -21,6 +22,9 @@ public class ProjectRestController {
 
 	@Autowired
 	MemberJpaRepository memberJpaRepository;
+
+	@Autowired
+	ChatRoomRepository chatRoomRepository;
 
 	private final Integer unitCount = 10;
 
@@ -86,6 +90,8 @@ public class ProjectRestController {
 				memberJpaRepository.save(member);
 			}
 		}
+
+		chatRoomRepository.createChatRoom("일반", project.getNo());
 
 		return project.getNo();
 	}
