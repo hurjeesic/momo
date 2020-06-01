@@ -68,12 +68,19 @@ public class ProjectRestController {
 	}
 
 	@GetMapping("/{no}")
-	public Project getProject(@PathVariable Integer no) {
-		return projectJpaRepository.findById(no).get();
+	public Project getProject(HttpSession session, @PathVariable Integer no) {
+		User user = (User)session.getAttribute("user");
+
+		Project project = projectJpaRepository.findById(no).get();
+		if (project.getOrganizer().equals(user)) {
+			return projectJpaRepository.findById(no).get();
+		}
+
+		return null;
 	}
 
 	@PostMapping("/insert")
-	public Integer createProject(HttpSession session, @ModelAttribute Project project, @ModelAttribute ApplyFieldList applyFields, @RequestParam String field) {
+	public Boolean createProject(HttpSession session, @ModelAttribute Project project, @ModelAttribute ApplyFieldList applyFields, @RequestParam String field) {
 		User user = (User)session.getAttribute("user");
 
 		project.setOrganizer(user);
@@ -93,29 +100,28 @@ public class ProjectRestController {
 
 		chatRoomRepository.createChatRoom("일반", project.getNo());
 
-		return project.getNo();
+		return true;
 	}
 
 	@PutMapping("/update")
-	public Integer updateProject(@ModelAttribute Project project) {
-		Project updatedProject = projectJpaRepository.save(project);
+	public Boolean updateProject(HttpSession session, @ModelAttribute Project project) {
+		if (session.getAttribute("user") != null) {
+			projectJpaRepository.save(project);
 
-		return updatedProject == null ? 0 : updatedProject.getNo();
+			return true;
+		}
+
+		return false;
 	}
 
-	@DeleteMapping("/delete/{no}")
-	public Integer deleteProject(HttpSession session, @PathVariable Integer no) {
-		Integer result = -1;
-		User user = (User)session.getAttribute("user");
+	@DeleteMapping("/delete")
+	public Boolean deleteProject(HttpSession session, @ModelAttribute Project project) {
+		if (session.getAttribute("user") != null) {
+			projectJpaRepository.deleteById(project.getNo());
 
-		if (user == null) {
-			result = 0;
-		}
-		else if (projectJpaRepository.findById(no).get().getOrganizer().equals(user)) {
-			projectJpaRepository.deleteById(no);
-			result = no;
+			return true;
 		}
 
-		return result;
+		return false;
 	}
 }
