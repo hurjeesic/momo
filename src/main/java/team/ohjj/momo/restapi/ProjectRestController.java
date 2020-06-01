@@ -104,7 +104,22 @@ public class ProjectRestController {
 	}
 
 	@PutMapping("/update")
-	public Boolean updateProject(HttpSession session, @ModelAttribute Project project) {
+	public Boolean updateProject(HttpSession session, @ModelAttribute Project project, @ModelAttribute ApplyFieldList applyFields, @RequestParam String field) {
+		User user = (User)session.getAttribute("user");
+
+		project.setOrganizer(user);
+		project = projectJpaRepository.save(project);
+
+		Member member = memberJpaRepository.findByProjectAndUser(project, user).get();
+		for (ApplyField applyField : applyFields.getApplyFieldList()) {
+			applyField.setProject(project);
+			applyFieldJpaRepository.save(applyField);
+			if (applyField.getField().equals(field)) {
+				member.setField(applyField);
+				memberJpaRepository.save(member);
+			}
+		}
+
 		if (session.getAttribute("user") != null) {
 			projectJpaRepository.save(project);
 

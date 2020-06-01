@@ -76,7 +76,7 @@
                 <input type="text" placeholder="직군">
                 <input type="number" min="1" placeholder="인원 수">
                 <button type="button" class="icon-btn" id="fieldAddBtn">
-                    <div class="fas fa-plus-circle"/>
+                    <div class="glyphicon glyphicon-plus-sign"/>
                 </button>
             </div>
         </div>
@@ -99,7 +99,7 @@
         <div class="container input-group input-group-lg">
             <h4><b>세부내용</b></h4>
             <div class="col-sm-6">
-                <input type="text" name="content" class="form-control" id="contentTxt">
+                <textarea name="content" class="form-control" id="contentTxt" rows="5"></textarea>
             </div>
         </div>
 
@@ -151,7 +151,7 @@
 		const addedObj = fields[fields.length - 1];
 		addedObj.children(':last').after(fieldAddBtn);
 
-		fieldAddBtn.after(`<button type="button" class="icon-btn"><div class="fas fa-minus-circle"/></button>`);
+		fieldAddBtn.after(`<button type="button" class="icon-btn"><div class="glyphicon glyphicon-minus-sign"/></button>`);
 
 		addedObj.children(':last').on('click', () => {
 			if (addedObj == fields[fields.length - 1]) {
@@ -176,9 +176,9 @@
 		else if (!contentTxt.val()) {
 			alert('프로젝트 내용을 입력해주세요.');
 		}
-        else if (!myFieldTxt.val()) {
-            alert('본인의 역할을 입력해주세요.');
-        }
+		else if (!myFieldTxt.val()) {
+			alert('본인의 역할을 입력해주세요.');
+		}
 		else {
 			let valid = true;
 			let fieldValid = false;
@@ -198,9 +198,9 @@
 					valid = false;
 				}
 
-                if (myFieldTxt.val() == field.val()) {
-	                fieldValid = true;
-                }
+				if (myFieldTxt.val() == field.val()) {
+					fieldValid = true;
+				}
 
 				if (!valid) {
 					break;
@@ -228,7 +228,7 @@
 						}
 					});
 				}
-                else {
+				else {
 					alert('본인의 역할은 전체 역할 내에 있어야합니다.');
 					myFieldTxt.focus();
 				}

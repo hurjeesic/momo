@@ -69,30 +69,30 @@
                         </tr>
                         </thead>
                         <tbody id="projectList">
-<!--                        <tr>-->
-<!--                            <td>1</td>-->
-<!--                            <td class="dropdown"><a href="">게임만들기</a>-->
-<!--                                <a class="dropdown-toggle pull-right"-->
-<!--                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
-<!--                                </a>-->
-<!--                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">-->
-<!--                                    게임만들기에 대한 간단한 설명입니다 이건 게임을 만드는 프로젝트에요-->
-<!--                                </div>-->
-<!--                            </td>-->
-<!--                            <td>모집중</td>-->
-<!--                            <td>고재우</td>-->
-<!--                            <td class="dropdown">4/5-->
-<!--                                <a class="dropdown-toggle pull-right"-->
-<!--                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
-<!--                                    ▽-->
-<!--                                </a>-->
-<!--                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">-->
-<!--                                    개발자 3 / 4-->
-<!--                                    <br>-->
-<!--                                    기획자 1 / 1-->
-<!--                                </div>-->
-<!--                            </td>-->
-<!--                        </tr>-->
+                        <!--                        <tr>-->
+                        <!--                            <td>1</td>-->
+                        <!--                            <td class="dropdown"><a href="">게임만들기</a>-->
+                        <!--                                <a class="dropdown-toggle pull-right"-->
+                        <!--                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+                        <!--                                </a>-->
+                        <!--                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">-->
+                        <!--                                    게임만들기에 대한 간단한 설명입니다 이건 게임을 만드는 프로젝트에요-->
+                        <!--                                </div>-->
+                        <!--                            </td>-->
+                        <!--                            <td>모집중</td>-->
+                        <!--                            <td>고재우</td>-->
+                        <!--                            <td class="dropdown">4/5-->
+                        <!--                                <a class="dropdown-toggle pull-right"-->
+                        <!--                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+                        <!--                                    ▽-->
+                        <!--                                </a>-->
+                        <!--                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">-->
+                        <!--                                    개발자 3 / 4-->
+                        <!--                                    <br>-->
+                        <!--                                    기획자 1 / 1-->
+                        <!--                                </div>-->
+                        <!--                            </td>-->
+                        <!--                        </tr>-->
                         </tbody>
                     </table>
                 </div>
@@ -160,10 +160,11 @@
 		url: `./api/project/list/${ pageNo == undefined ? 1 : pageNo }`,
 		dataType: 'json',
 		success: (data) => {
-			projectList.empty();
+			projectList.empty(); //Detail
+			console.log(data);
 			data.map((obj) => {
 				let item = `<tr><td>${ obj.project.no }</td><td class="dropdown">` +
-					`<a href=./projectDetail.html">${ obj.project.title }</a>` +
+					`<a href=./projectFix.html?no=${ obj.project.no }>${ obj.project.title }</a>` +
 					'<a class="dropdown-toggle pull-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>' +
 					`<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">${ obj.project.content }</div></td><td>`;
 
@@ -196,18 +197,13 @@
 				}
 
 				for (let applyField of obj.applyFields) { // 전체 인원 현황
-					if (allNumbers.hasOwnProperty(applyField.field)) {
-						allNumbers[applyField.field]++;
-					}
-					else {
-						allNumbers[applyField.field] = 1;
-					}
+					allNumbers[applyField.field] = applyField.number;
 
-					allNumber++;
+					allNumber += applyField.number;
 				}
 
 				item += `<td class="dropdown">${ presentNumber } / ${ allNumber }` +
-					'<a class="dropdown-toggle pull-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">▽</a>' +
+					'<span class="pull-right">▽</span>' +
 					'<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">';
 
 				for (let field in allNumbers) {
