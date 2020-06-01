@@ -132,7 +132,7 @@
 
 	$.ajax({
 		type: 'get',
-		url: 'http://localhost:8080/api/user/',
+		url: './api/user/',
 		dataType: 'json',
 		async: false,
 		success: (data) => {
@@ -214,7 +214,7 @@
 				if (fieldValid) {
 					$.ajax({
 						type: 'post',
-						url: 'http://localhost:8080/api/project/insert',
+						url: '/api/project/insert',
 						dataType: 'json',
 						data: $('form').serializeArray(),
 						async: false,

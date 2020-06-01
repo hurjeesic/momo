@@ -104,7 +104,7 @@
 			if (emailExp.test(emailTxt.val())) {
 				$.ajax({
 					type: 'get',
-					url: 'http://localhost:8080/api/user/check/email',
+					url: './api/user/check/email',
 					dataType: 'json',
 					data: { email: emailTxt.val() },
 					async: false,
@@ -112,7 +112,7 @@
 						if (data) {
 							$.ajax({
 								type: 'get',
-								url: 'http://localhost:8080/api/user/confirm/email',
+								url: './api/user/confirm/email',
 								data: { email: emailTxt.val() },
 								async: false,
 								success: () => {
@@ -157,7 +157,7 @@
 		else {
 			$.ajax({
 				type: 'get',
-				url: 'http://localhost:8080/api/user/confirm/email/check',
+				url: './api/user/confirm/email/check',
 				data: { code: codeTxt.val() },
 				async: false,
 				success: (data) => {
@@ -188,7 +188,7 @@
 		else {
 			$.ajax({
 				type: 'get',
-				url: 'http://localhost:8080/api/user/check/nickname',
+				url: './api/user/check/nickname',
 				data: { nickname: nicknameTxt.val() },
 				async: false,
 				success: (data) => {
@@ -228,7 +228,7 @@
 		else {
 			$.ajax({
 				type: 'post',
-				url: 'http://localhost:8080/api/user/insert',
+				url: './api/user/insert',
 				data: {
 					email: emailTxt.val(), password: pwdTxt.val(),
 					nickname: nicknameTxt.val(), phone: phoneTxt.val()

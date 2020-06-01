@@ -143,7 +143,7 @@
 
 	$.ajax({
 		type: 'get',
-		url: 'http://localhost:8080/api/user/',
+		url: './api/user/',
 		dataType: 'json',
 		async: false,
 		success: (data) => {
@@ -157,13 +157,13 @@
 
 	$.ajax({
 		type: 'get',
-		url: `http://localhost:8080/api/project/list/${ pageNo == undefined ? 1 : pageNo }`,
+		url: `./api/project/list/${ pageNo == undefined ? 1 : pageNo }`,
 		dataType: 'json',
 		success: (data) => {
 			projectList.empty();
 			data.map((obj) => {
 				let item = `<tr><td>${ obj.project.no }</td><td class="dropdown">` +
-					`<a href=http://localhost:8080/projectDetail.html">${ obj.project.title }</a>` +
+					`<a href=./projectDetail.html">${ obj.project.title }</a>` +
 					'<a class="dropdown-toggle pull-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>' +
 					`<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">${ obj.project.content }</div></td><td>`;
 
