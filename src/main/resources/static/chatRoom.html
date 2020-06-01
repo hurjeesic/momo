@@ -241,6 +241,10 @@
 					connect();
 				}, 10 * 1000);
 			}
+			else {
+				alert('연결이 끊겼습니다.');
+				window.location = './index.html';
+			}
 		});
 	}
 
