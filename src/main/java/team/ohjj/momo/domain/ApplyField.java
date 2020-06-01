@@ -10,6 +10,7 @@ import javax.persistence.*;
 @Table(name = "apply_field", uniqueConstraints = @UniqueConstraint(columnNames = { "project", "field" }))
 @Getter
 @Setter
+@ToString
 public class ApplyField {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,14 +29,4 @@ public class ApplyField {
     @Column(nullable = false)
     @JsonProperty
     private int number;
-
-    @Override
-    public String toString() {
-        return "ApplyField{" +
-                "no=" + no +
-                ", project=" + project.toString() +
-                ", field='" + field + '\'' +
-                ", number=" + number +
-                '}';
-    }
 }
