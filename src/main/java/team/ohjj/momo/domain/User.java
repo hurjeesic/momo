@@ -2,11 +2,13 @@ package team.ohjj.momo.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
+@EqualsAndHashCode
 public class User implements Serializable {
 	private static final long serialVersionUID = 6494678977089006639L;
 
@@ -81,5 +83,17 @@ public class User implements Serializable {
 
 	public void setType(byte type) {
 		this.type = type;
+	}
+
+	@Override
+	public String toString() {
+		return "User{" +
+				"no=" + no +
+				", email='" + email + '\'' +
+				", password='" + password + '\'' +
+				", nickname='" + nickname + '\'' +
+				", phone='" + phone + '\'' +
+				", type=" + type +
+				'}';
 	}
 }
