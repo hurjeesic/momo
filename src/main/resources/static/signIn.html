@@ -44,22 +44,39 @@
     </div>
 </nav>
 <div class="container">
-    <div class="jumbotron">
+    <div class="jumbotron col-sm-offset-2 col-sm-8">
         <h1 class="text-center">모모게시판</h1>
         <p class="text-center"> 프로젝트의 거대한 도우미</p>
     </div>
+
+    <div class="row">
+        <div class="col-sm-offset-3 col-sm-6 input-group-lg">
+            <input type="email" class="form-control" id="emailTxt" placeholder="이메일">
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-offset-3 col-sm-6 input-group-lg">
+            <input type="password" class="form-control" id="pwdTxt" placeholder="비밀번호">
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-offset-3 col-sm-6">
+            <button type="submit" class="btn btn-primary btn-lg pull-right" id="loginBtn">로그인</button>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-offset-3 col-sm-6">
+            <button type="button" class="btn btn-default" id="signUpBtn">회원가입</button>
+            <button type="button" class="btn btn-default pull-right">비밀번호 찾기</button>
+        </div>
+    </div>
+
     <form class="navbar-form navbar-left">
         <input type="hidden" id="type" value="2">
         <div class="container input-group input-group-lg">
-            <input type="email" class="form-control" id="emailTxt" placeholder="이메일">
-        </div>
-        <div class=" container input-group input-group-lg">
-            <input type="password" class="form-control" id="pwdTxt" placeholder="비밀번호">
-            <br>
-            <button type="button" class="btn btn-primary btn-lg" id="loginBtn">로그인</button>
-            <br>
-            <button type="button" class="btn btn-default" id="signUpBtn">회원가입</button>
-            <button type="button" class="btn btn-default">비밀번호 찾기</button>
         </div>
     </form>
 </div>
