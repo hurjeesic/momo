@@ -97,7 +97,7 @@
 			if (emailExp.test(emailTxt.val())) {
 				$.ajax({
 					type: 'post',
-					url: 'http://localhost:8080/api/user/login',
+					url: './api/user/login',
 					dataType: 'json',
 					data: { email: emailTxt.val(), password: $('#pwdTxt').val(), type: $('#type').val() },
 					success: (data) => {

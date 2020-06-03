@@ -1,11 +1,18 @@
 package team.ohjj.momo.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
-public class Project {
+@Getter
+@Setter
+public class Project implements Serializable {
+    private static final long serialVersionUID = 6494678977089006639L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty
@@ -31,64 +38,4 @@ public class Project {
     @Column
     @JsonProperty
     private byte apply;
-
-    public int getNo() {
-        return no;
-    }
-
-    public void setNo(int no) {
-        this.no = no;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public User getOrganizer() {
-        return organizer;
-    }
-
-    public void setOrganizer(User organizer) {
-        this.organizer = organizer;
-    }
-
-    public byte getProcess() {
-        return process;
-    }
-
-    public void setProcess(byte process) {
-        this.process = process;
-    }
-
-    public byte getApply() {
-        return apply;
-    }
-
-    public void setApply(byte apply) {
-        this.apply = apply;
-    }
-
-    @Override
-    public String toString() {
-        return "Project{" +
-                "no=" + no +
-                ", title='" + title + '\'' +
-                ", content='" + content + '\'' +
-                ", organizer=" + organizer +
-                ", process=" + process +
-                ", apply=" + apply +
-                '}';
-    }
 }

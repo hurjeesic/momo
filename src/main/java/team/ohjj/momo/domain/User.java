@@ -2,92 +2,42 @@ package team.ohjj.momo.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonProperty
-    private int no;
+@Getter
+@Setter
+@EqualsAndHashCode
+public class User implements Serializable {
+	private static final long serialVersionUID = 6494678977089006639L;
 
-    @Column(unique = true, nullable = false)
-    @JsonProperty
-    private String email;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@JsonIgnore
+	private int no;
 
-    @JsonIgnore
-    @Column(nullable = false)
-    private String password;
+	@Column(unique = true, nullable = false)
+	@JsonProperty
+	private String email;
 
-    @Column(unique = true, nullable = false)
-    @JsonProperty
-    private String nickname;
+	@Column(nullable = false)
+	@JsonIgnore
+	private String password;
 
-    @JsonProperty
-    private String phone;
+	@Column(unique = true, nullable = false)
+	@JsonProperty
+	private String nickname;
 
-    @JsonIgnore
-    @Column(nullable = false)
-    private byte type;
+	@JsonProperty
+	private String phone;
 
-    public int getNo() {
-        return no;
-    }
 
-    public void setNo(int no) {
-        this.no = no;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public byte getType() {
-        return type;
-    }
-
-    public void setType(byte type) {
-        this.type = type;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "no=" + no +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", nickname='" + nickname + '\'' +
-                ", phone='" + phone + '\'' +
-                ", type=" + type +
-                '}';
-    }
+	@Column(nullable = false)
+	@JsonIgnore
+	private byte type;
 }
