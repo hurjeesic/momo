@@ -34,46 +34,69 @@ public class ProjectRestController {
 	}
 
 	@GetMapping("/list/{pageNo}")
-	public List<Map<String, Object>> getProjectList(@PathVariable Integer pageNo) {
-		List<Project> allProject = projectJpaRepository.findAll();
-		List<Project> partProject = new ArrayList<>();
-		List<Map<String, Object>> result = new ArrayList<>();
+	public List<Map<String, Object>> getProjectList(HttpSession session, @PathVariable Integer pageNo) {
+		User user = (User)session.getAttribute("user");
+		List<Map<String, Object>> result = null;
 
-		try {
-			int endPage = unitCount * pageNo;
-			for (int i = endPage - 10; i < (allProject.size() < endPage ? allProject.size() : endPage); i++) {
-				Map<String, Object> projectObj = new HashMap<>();
-				partProject.add(allProject.get(i));
-				Project presentProject = partProject.get(i - unitCount * (pageNo - 1));
+		if (user != null) {
+			List<Project> allProject = projectJpaRepository.findAllByOrganizerNot(user);
+			List<Project> partProject = new ArrayList<>();
+			result = new ArrayList<>();
 
-				List<ApplyField> applyFieldList = applyFieldJpaRepository.findAllByProject(presentProject);
-				List<Member> memberList = memberJpaRepository.findAllByProject(presentProject);
-
-				if (presentProject.getContent().length() > 20) {
-					presentProject.setContent(presentProject.getContent().substring(0, 20) + "...");
+			int index = 0;
+			for (int i = 0; i < allProject.size(); i++) {
+				if (memberJpaRepository.findByProjectAndUser(allProject.get(index), user).isPresent()) {
+					allProject.remove(index--);
 				}
-
-				projectObj.put("project", presentProject);
-				projectObj.put("applyFields", applyFieldList);
-				projectObj.put("members", memberList);
-				result.add(projectObj);
 			}
-		}
-		catch (Exception e) {
-			System.out.println(e);
-			e.printStackTrace();
+
+			try {
+				int endPage = unitCount * pageNo;
+				for (int i = endPage - 10; i < (allProject.size() < endPage ? allProject.size() : endPage); i++) {
+					Map<String, Object> projectObj = new HashMap<>();
+					partProject.add(allProject.get(i));
+					Project presentProject = partProject.get(i - unitCount * (pageNo - 1));
+
+					List<ApplyField> applyFieldList = applyFieldJpaRepository.findAllByProject(presentProject);
+					List<Member> memberList = memberJpaRepository.findAllByProject(presentProject);
+
+					if (presentProject.getContent().length() > 20) {
+						presentProject.setContent(presentProject.getContent().substring(0, 20) + "...");
+					}
+
+					projectObj.put("project", presentProject);
+					projectObj.put("applyFields", applyFieldList);
+					projectObj.put("members", memberList);
+					result.add(projectObj);
+				}
+			}
+			catch (Exception e) {
+				System.out.println(e);
+				e.printStackTrace();
+			}
+
+			return result;
 		}
 
 		return result;
 	}
 
 	@GetMapping("/{no}")
-	public Project getProject(HttpSession session, @PathVariable Integer no) {
+	public Map<String, Object> getProject(HttpSession session, @PathVariable Integer no, @RequestParam Boolean apply) {
 		User user = (User)session.getAttribute("user");
 
 		Project project = projectJpaRepository.findById(no).get();
-		if (project.getOrganizer().equals(user)) {
-			return projectJpaRepository.findById(no).get();
+		if (memberJpaRepository.findByProjectAndUser(project, user).isPresent() ^ apply) {
+			Map<String, Object> projectObj = new HashMap<>();
+
+			List<ApplyField> applyFieldList = applyFieldJpaRepository.findAllByProject(project);
+			List<Member> memberList = memberJpaRepository.findAllByProject(project);
+
+			projectObj.put("project", project);
+			projectObj.put("applyFields", applyFieldList);
+			projectObj.put("members", memberList);
+
+			return projectObj;
 		}
 
 		return null;
