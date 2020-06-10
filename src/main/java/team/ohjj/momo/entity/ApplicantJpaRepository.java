@@ -7,5 +7,5 @@ import team.ohjj.momo.domain.ApplicantPK;
 import java.util.Optional;
 
 public interface ApplicantJpaRepository extends JpaRepository<Applicant, ApplicantPK> {
-
+	Optional<Applicant> findByProjectAndUser(int project, int user);
 }

@@ -3,10 +3,7 @@ package team.ohjj.momo.restapi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import team.ohjj.momo.domain.*;
-import team.ohjj.momo.entity.ApplyFieldJpaRepository;
-import team.ohjj.momo.entity.ChatRoomRepository;
-import team.ohjj.momo.entity.MemberJpaRepository;
-import team.ohjj.momo.entity.ProjectJpaRepository;
+import team.ohjj.momo.entity.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
@@ -25,6 +22,9 @@ public class ProjectRestController {
 
 	@Autowired
 	ChatRoomRepository chatRoomRepository;
+
+	@Autowired
+	ApplicantJpaRepository applicantJpaRepository;
 
 	private final Integer unitCount = 10;
 
@@ -45,7 +45,8 @@ public class ProjectRestController {
 
 			int index = 0;
 			for (int i = 0; i < allProject.size(); i++) {
-				if (memberJpaRepository.findByProjectAndUser(allProject.get(index), user).isPresent()) {
+				if (memberJpaRepository.findByProjectAndUser(allProject.get(index), user).isPresent() ||
+					applicantJpaRepository.findByProjectAndUser(allProject.get(index).getNo(), user.getNo()).isPresent()) {
 					allProject.remove(index--);
 				}
 			}
