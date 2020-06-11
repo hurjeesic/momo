@@ -22,11 +22,11 @@
             outline: 0;
             background: transparent;
         }
+
         .noresize {
             resize: none; /* 사용자 임의 변경 불가 */
         }
     </style>
-
 </head>
 <body>
 <nav class="navbar navbar-default">
@@ -57,32 +57,45 @@
         </div>
     </div>
 </nav>
-
 <div class="container">
     <div class="jumbotron">
         <h1 class="text-center">모모게시판</h1>
         <p class="text-center"> 프로젝트의 거대한 도우미</p>
     </div>
 </div>
-
 <div>
     <form>
+        <input type="hidden" name="project" id="projectNo">
         <div class="container input-group input-group-lg">
             <div class="col-sm-6">
-                <h1>게임만들기</h1>
+                <h1 id="title">게임만들기</h1>
+            </div>
+        </div>
+
+        <div class="container input-group input-group-lg">
+            <h4><b>주최자</b></h4>
+            <div class="col-sm-6" id="organizer">
+                jimen
             </div>
         </div>
 
         <div class="container input-group input-group-lg" id="employees">
-            <h4><b>인원</b></h4>
-            <div class="col-sm-6 input-group">
-                6/2
+            <h4><b>전체 인원 / 현재 인원</b></h4>
+            <div class="col-sm-6" id="number">
+                6 / 2
+            </div>
+        </div>
+
+        <div class="container input-group input-group-lg">
+            <h4><b>진행 상황</b></h4>
+            <div class="col-sm-6" id="process">
+                모집 중
             </div>
         </div>
 
         <div class="container input-group">
             <h4><b>기간</b></h4>
-            <div class="col-sm-3">
+            <div class="col-sm-3" id="date">
                 2020-4-27 ~ 2020-5-27
             </div>
         </div>
@@ -90,7 +103,8 @@
         <div class="container input-group input-group-lg">
             <h4><b>세부내용</b></h4>
             <div class="col-sm-6">
-                <textarea class="form-control col-sm-5 noresize" rows="10" cols="30"></textarea>            </div>
+                <textarea class="form-control col-sm-5 noresize" id="content" rows="10" cols="30" disabled></textarea>
+            </div>
         </div>
 
         <div class="container">
@@ -98,22 +112,27 @@
                 <div class="text-center">
                     <!-- 모달을 열기 위한 버튼 -->
                     <button type="button" class="btn btn-primary btn-lg" id="openModalBtn">
-                        신청
+                        신청하기
                     </button>
                     <!-- 모달 영역 -->
-                    <div id="modalBox" class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div id="modalBox" class="modal fade" id="myModal" tabindex="-1" role="dialog"
+                         aria-labelledby="myModalLabel">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                            aria-hidden="true">×</span></button>
                                     <h4 class="modal-title" id="myModalLabel">자기소개</h4>
                                 </div>
                                 <div class="modal-body">
-                                    <textarea class="form-control col-sm-5 noresize" rows="10" cols="30"></textarea>
+                                    <div id="fields"></div>
+                                    <br>
+                                    <textarea name="content" class="form-control col-sm-5 noresize" rows="10"
+                                              cols="30"></textarea>
                                 </div>
                                 <br>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-primary">확인</button>
+                                    <button type="button" class="btn btn-primary" id="applyBtn">신청</button>
                                     <button type="button" class="btn btn-default" id="closeModalBtn">취소</button>
                                 </div>
                             </div>
@@ -128,19 +147,131 @@
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="js/bootstrap.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
-
-
 <script>
-    // 모달 버튼에 이벤트를 건다.
-    $('#openModalBtn').on('click', function(){
-        $('#modalBox').modal('show');
-    });
-    // 모달 안의 취소 버튼에 이벤트를 건다.
-    $('#closeModalBtn').on('click', function(){
-        $('#modalBox').modal('hide');
-    });
+	const openModalBtn = $('#openModalBtn');
+	const closeModalBtn = $('#closeModalBtn');
+	const fields = $('#fields');
+	const applyBtn = $('#applyBtn');
+	const params = getParameters();
+
+	function getParameters() {
+		const url = document.location.href;
+		const qs = url.substring(url.indexOf('?') + 1).split('&');
+		const result = {};
+		for (let i = 0; i < qs.length; i++) {
+			qs[i] = qs[i].split('=');
+			result[qs[i][0]] = decodeURIComponent(qs[i][1]);
+		}
+
+		return result;
+	}
+
+	$.ajax({
+		type: 'get',
+		url: './api/user/',
+		dataType: 'json',
+		async: false,
+		success: (data) => {
+			// 받은 유저 정보를 출력
+		},
+		error: () => {
+			alert('세션이 만료되었습니다.');
+			window.location = './signIn.html';
+		}
+	});
+
+	$.ajax({
+		type: 'get',
+		url: `./api/project/${ params.no }`,
+		dataType: 'json',
+		data: { apply: true },
+		async: false,
+		success: (data) => {
+			const presentNumbers = {};
+			const allNumbers = {};
+			const processList = ['모집중', '진행중', '완료'];
+			let presentNumber = 0, allNumber = 0;
+
+			$('#projectNo').val(data.project.no);
+
+			$('#title').val(data.project.title);
+			$('#organizer').val(data.project.organizer.nickname);
+
+
+			for (const member of data.members) { // 현재 인원 현황
+				const field = member.field.field;
+				presentNumbers[field] = presentNumbers.hasOwnProperty(field) ? presentNumbers[field] + 1 : 1;
+				presentNumber++;
+			}
+
+			let first = true;
+			for (const applyField of data.applyFields) { // 전체 인원 현황
+				const field = applyField.field;
+
+				allNumbers[field] = applyField.number;
+				allNumber += applyField.number;
+
+				if (presentNumbers.hasOwnProperty(applyField.field)) {
+					presentNumbers[applyField.field] = 0;
+				}
+
+				if (allNumbers[field] - presentNumbers[field] != 0) {
+					fields.append(`<input type="radio" name="field.no" id="${ field }" value="${ applyField.no }" ${ first ? 'checked' : '' }><label for="${ field }">${ field }</label>`);
+					first = false;
+				}
+			}
+
+			let item = `<div class="dropdown">${ presentNumber } / ${ allNumber }` +
+				'<span class="pull-right">▽</span>' +
+				'<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">';
+
+			for (const field in allNumbers) {
+				item += `${ field } ${ presentNumbers[field] } / ${ allNumbers[field] }<br>`;
+			}
+
+			item = item.substr(0, item.length - 4);
+
+			item += '</div></div>';
+
+			$('#number').val(item);
+			$('#process').val(processList[data.project.process]);
+			$('#date').val(`${ data.project.start } ~ ${ data.project.end }`);
+			$('#content').val(data.project.content);
+		},
+		error: () => {
+			alert('세션이 만료되었습니다.');
+			window.location = './signIn.html';
+		}
+	});
+
+	// 모달 버튼에 이벤트를 건다.
+	openModalBtn.on('click', function () {
+		$('#modalBox').modal('show');
+	});
+
+	// 모달 안의 취소 버튼에 이벤트를 건다.
+	closeModalBtn.on('click', function () {
+		$('#modalBox').modal('hide');
+	});
+
+	applyBtn.on('click', function () {
+		$.ajax({
+			type: 'post',
+			url: `./api/applicant/insert`,
+			dataType: 'json',
+			data: $('form').serialize(),
+			async: false,
+			success: (data) => {
+				alert('신청이 완료되었습니다.');
+				window.location = './index.html';
+			},
+			error: (request) => {
+				alert(request.status);
+				alert('세션이 만료되었습니다.');
+				window.location = './signIn.html';
+			}
+		});
+	});
 </script>
-
 </body>
-
 </html>

@@ -91,8 +91,8 @@
         <div class="container input-group">
             <h4><b>기간</b></h4>
             <div class="col-sm-3">
-                <input type="date" id="startDate">
-                <input type="date" id="endDate">
+                <input type="date" name="start" id="startDate">
+                <input type="date" name="end" id="endDate">
             </div>
         </div>
 
@@ -129,6 +129,8 @@
 	const titleTxt = $('#titleTxt');
 	const contentTxt = $('#contentTxt');
 	const myFieldTxt = $('#myFieldTxt');
+	const startDateTxt = $('#startDate');
+	const endDateTxt = $('#endDate');
 
 	$.ajax({
 		type: 'get',
@@ -179,12 +181,18 @@
 		else if (!myFieldTxt.val()) {
 			alert('본인의 역할을 입력해주세요.');
 		}
+		else if (!startDateTxt.val()) {
+			alert('프로젝트 시작 날짜를 입력해주세요.');
+		}
+		else if (!endDateTxt.val()) {
+			alert('프로젝트 종료 날짜를 입력해주세요.');
+		}
 		else {
 			let valid = true;
 			let fieldValid = false;
 			for (let i = 0; i < fields.length; i++) {
-				let field = fields[i].children('input[type=text]');
-				let number = fields[i].children('input[type=number]');
+				const field = fields[i].children('input[type=text]');
+				const number = fields[i].children('input[type=number]');
 				if (!field.val()) {
 					alert('모든 직군을 적어주세요.');
 					valid = false;
