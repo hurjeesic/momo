@@ -131,6 +131,16 @@
                                 </div>
                                 <br>
                                 <div class="modal-footer">
+<<<<<<< HEAD
+=======
+                                    <div class="pull-left">
+                                        <select>
+                                            <option>지원군1</option>
+                                            <option>지원군2</option>
+                                        </select>
+                                    </div>
+
+>>>>>>> feature/프로젝트페이지
                                     <button type="button" class="btn btn-primary" id="applyBtn">신청</button>
                                     <button type="button" class="btn btn-default" id="closeModalBtn">취소</button>
                                 </div>
@@ -215,7 +225,11 @@
 				}
 
 				if (allNumbers[field] - presentNumbers[field] != 0) {
+<<<<<<< HEAD
 					fields.append(`<input type="radio" name="field.no" id="${ field }" value="${ applyField.no }" ${ first ? 'checked' : '' }><label for="${ field }">${ field }</label>`);
+=======
+					fields.append(`<select name="field.no" id="${ field }" value="${ applyField.no }" ${ first ? 'checked' : '' }><label for="${ field }">${ field }</label>`);
+>>>>>>> feature/프로젝트페이지
 					first = false;
 				}
 			}
