@@ -38,12 +38,18 @@
                 <li class="active"><a href="">게시판 <span class="sr-only"></span></a></li>
                 <li class="active"><a href="">기업진 <span class="sr-only"></span></a></li>
             </ul>
+
             <form class="navbar-form navbar-left">
                 <div class="form-group">
                     <input type="text" class="form-control" placeholder="내용을 입력하세요">
                 </div>
                 <button type="submit" class="btn btn-default">검색</button>
             </form>
+
+            <ul class="nav navbar-nav pull-right">
+                <li class="active"><a href="">마이페이지 <span class="sr-only"></span></a></li>
+            </ul>
+
         </div>
     </div>
 </nav>
@@ -161,10 +167,9 @@
 		dataType: 'json',
 		success: (data) => {
 			projectList.empty(); //Detail
-			console.log(data);
 			data.map((obj) => {
 				let item = `<tr><td>${ obj.project.no }</td><td class="dropdown">` +
-					`<a href=./projectFix.html?no=${ obj.project.no }>${ obj.project.title }</a>` +
+					`<a href=./project.html?no=${ obj.project.no }>${ obj.project.title }</a>` +
 					'<a class="dropdown-toggle pull-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>' +
 					`<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">${ obj.project.content }</div></td><td>`;
 
@@ -200,6 +205,10 @@
 					allNumbers[applyField.field] = applyField.number;
 
 					allNumber += applyField.number;
+
+					if (!presentNumbers.hasOwnProperty(applyField.field)) {
+						presentNumbers[applyField.field] = 0;
+					}
 				}
 
 				item += `<td class="dropdown">${ presentNumber } / ${ allNumber }` +
@@ -207,7 +216,7 @@
 					'<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">';
 
 				for (let field in allNumbers) {
-					item += `${ field } ${ presentNumbers[field] ? presentNumbers[field] : 0 } / ${ allNumbers[field] }<br>`;
+					item += `${ field } ${ presentNumbers[field] } / ${ allNumbers[field] }<br>`;
 				}
 
 				item = item.substr(0, item.length - 4);

@@ -43,10 +43,15 @@
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="">포트폴리오<span class="sr-only"></span></a></li>
-                <li class="active"><a href="">게시판<span class="sr-only"></span></a></li>
-                <li class="active"><a href="">기업진<span class="sr-only"></span></a></li>
+                <li class="active"><a href="">포트폴리오 <span class="sr-only"></span></a></li>
+                <li class="active"><a href="">게시판 <span class="sr-only"></span></a></li>
+                <li class="active"><a href="">기업진 <span class="sr-only"></span></a></li>
             </ul>
+
+            <ul class="nav navbar-nav pull-right">
+                <li class="active"><a href="">마이페이지 <span class="sr-only"></span></a></li>
+            </ul>
+
         </div>
     </div>
 </nav>
@@ -73,7 +78,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-offset-1 col-sm-9">
+        <div class="col-sm-offset-1 col-sm-7">
             <h1>&nbsp;</h1>
             <div class="table" style="width:100%; height:200px; overflow:auto">
                 <table class="table results" width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -89,10 +94,6 @@
                         <td>우리 프로젝트의 미래는 어떻게 될까??</td>
                     </tr>
                     <tr>
-                        <td>현지호</td>
-                        <td>그건 아무도 모르겟지</td>
-                    </tr>
-                    <tr>
                         <td>허지식</td>
                         <td>수련이 부족해서 그렇다</td>
                     </tr>
@@ -101,6 +102,13 @@
                 <input type="text" id="messageTxt">
                 <button type="button" id="sendBtn">입력</button>
             </div>
+        </div>
+        <div class="col-sm-2">
+            <h1>참여인원</h1>
+            <ul class="list-group" id="chatUserList">
+                <li class="list-group-item">고재우<input class="pull-right" type="checkbox" disabled readonly></li>
+                <li class="list-group-item">허지식 <button class="pull-right" type="submit">완료</button></li>
+            </ul>
         </div>
     </div>
 </div>
