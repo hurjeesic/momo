@@ -79,21 +79,25 @@
 <script src="js/bootstrap.js"></script>
 <script>
 	const emailTxt = $('#emailTxt');
+	const pwdTxt = $('#pwdTxt');
 
-	$('#loginBtn').on('click', () => {
+	function login() {
 		if (emailTxt.val() == '') {
 			alert('이메일을 입력해주세요.');
 			emailTxt.focus();
 		}
+		else if (pwdTxt.val() == '') {
+			alert('비밀번호를 입력해주세요.');
+			pwdTxt.focus();
+		}
 		else {
 			const emailExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
-
 			if (emailExp.test(emailTxt.val())) {
 				$.ajax({
 					type: 'post',
 					url: './api/user/login',
 					dataType: 'json',
-					data: { email: emailTxt.val(), password: $('#pwdTxt').val(), type: $('#type').val() },
+					data: { email: emailTxt.val(), password: pwdTxt.val(), type: $('#type').val() },
 					success: (data) => {
 						window.location = './index.html';
 					},
@@ -109,6 +113,24 @@
 				emailTxt.focus();
 			}
 		}
+	}
+
+	emailTxt.on('keydown', (e) => {
+		if (e.which == 13) {
+			e.preventDefault();
+			login();
+		}
+	});
+
+	pwdTxt.on('keydown', (e) => {
+		if (e.which == 13) {
+			e.preventDefault();
+			login();
+		}
+	});
+
+	$('#loginBtn').on('click', () => {
+		login();
 	});
 
 	$('#signUpBtn').on('click', () => {
