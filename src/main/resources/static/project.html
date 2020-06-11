@@ -124,23 +124,14 @@
                                     <h4 class="modal-title" id="myModalLabel">자기소개</h4>
                                 </div>
                                 <div class="modal-body">
-                                    <div id="fields"></div>
-                                    <br>
                                     <textarea name="content" class="form-control col-sm-5 noresize" rows="10"
                                               cols="30"></textarea>
                                 </div>
                                 <br>
                                 <div class="modal-footer">
-<<<<<<< HEAD
-=======
                                     <div class="pull-left">
-                                        <select>
-                                            <option>지원군1</option>
-                                            <option>지원군2</option>
-                                        </select>
+                                        <select name="field.no" id="fields"></select>
                                     </div>
-
->>>>>>> feature/프로젝트페이지
                                     <button type="button" class="btn btn-primary" id="applyBtn">신청</button>
                                     <button type="button" class="btn btn-default" id="closeModalBtn">취소</button>
                                 </div>
@@ -193,7 +184,6 @@
 		type: 'get',
 		url: `./api/project/${ params.no }`,
 		dataType: 'json',
-		data: { apply: true },
 		async: false,
 		success: (data) => {
 			const presentNumbers = {};
@@ -213,7 +203,6 @@
 				presentNumber++;
 			}
 
-			let first = true;
 			for (const applyField of data.applyFields) { // 전체 인원 현황
 				const field = applyField.field;
 
@@ -225,12 +214,7 @@
 				}
 
 				if (allNumbers[field] - presentNumbers[field] != 0) {
-<<<<<<< HEAD
-					fields.append(`<input type="radio" name="field.no" id="${ field }" value="${ applyField.no }" ${ first ? 'checked' : '' }><label for="${ field }">${ field }</label>`);
-=======
-					fields.append(`<select name="field.no" id="${ field }" value="${ applyField.no }" ${ first ? 'checked' : '' }><label for="${ field }">${ field }</label>`);
->>>>>>> feature/프로젝트페이지
-					first = false;
+					fields.append(`<option value="${ applyField.no }" >${ field }</option>`);
 				}
 			}
 
@@ -257,34 +241,41 @@
 		}
 	});
 
-	// 모달 버튼에 이벤트를 건다.
-	openModalBtn.on('click', function () {
-		$('#modalBox').modal('show');
-	});
-
-	// 모달 안의 취소 버튼에 이벤트를 건다.
-	closeModalBtn.on('click', function () {
-		$('#modalBox').modal('hide');
-	});
-
-	applyBtn.on('click', function () {
-		$.ajax({
-			type: 'post',
-			url: `./api/applicant/insert`,
-			dataType: 'json',
-			data: $('form').serialize(),
-			async: false,
-			success: (data) => {
-				alert('신청이 완료되었습니다.');
-				window.location = './index.html';
-			},
-			error: (request) => {
-				alert(request.status);
-				alert('세션이 만료되었습니다.');
-				window.location = './signIn.html';
-			}
+	if (params.check) {
+		openModalBtn.text('확인');
+		openModalBtn.on('click', function () {
+            window.location='./mypage.html';
 		});
-	});
+	}
+	else {
+		// 모달 버튼에 이벤트를 건다.
+		openModalBtn.on('click', function () {
+			$('#modalBox').modal('show');
+		});
+
+		// 모달 안의 취소 버튼에 이벤트를 건다.
+		closeModalBtn.on('click', function () {
+			$('#modalBox').modal('hide');
+		});
+
+		applyBtn.on('click', function () {
+			$.ajax({
+				type: 'post',
+				url: `./api/applicant/insert`,
+				dataType: 'json',
+				data: $('form').serialize(),
+				async: false,
+				success: (data) => {
+					alert('신청이 완료되었습니다.');
+					window.location = './index.html';
+				},
+				error: () => {
+					alert('세션이 만료되었습니다.');
+					window.location = './signIn.html';
+				}
+			});
+		});
+	}
 </script>
 </body>
 </html>
