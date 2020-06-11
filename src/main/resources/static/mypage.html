@@ -13,6 +13,10 @@
             color: white;
         }
 
+        .dropdown:hover > .dropdown-menu {
+            display: block;
+        }
+
         .main-area {
             border: 1px solid #ccc;
             border-radius: 10px;
@@ -60,24 +64,24 @@
             <div class="col-sm-offset-1 col-sm-10">
                 <table class="table mt-3">
                     <tbody>
-                        <tr>
-                            <th>이름</th>
-                            <td>고재우</td>
-                        </tr>
-                        <tr>
-                            <th>이메일</th>
-                            <td>cake427@naver.com</td>
-                        </tr>
-                        <tr>
-                            <th>전화번호</th>
-                            <td>010-4440-2351</td>
-                        </tr>
-                        <tr>
-                            <th>
-                                <button type="button">포트폴리오</button>
-                            </th>
-                            <td></td>
-                        </tr>
+                    <tr>
+                        <th>닉네임</th>
+                        <th id="nameLbl">고재우</th>
+                    </tr>
+                    <tr>
+                        <th>이메일</th>
+                        <th id="emailLbl">cake427@naver.com</th>
+                    </tr>
+                    <tr>
+                        <th>전화번호</th>
+                        <th id="phoneLbl">010-4440-2351</th>
+                    </tr>
+                    <tr>
+                        <th>
+                            <button type="button">포트폴리오</button>
+                        </th>
+                        <td></td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -87,7 +91,7 @@
         <div class="row">
             <div class="">
                 <h1>신청한 프로젝트</h1>
-                <ul class="list-group">
+                <ul class="list-group" id="applyProjects">
                     <li class="list-group-item"><a href="">게임도 만들고싶고</a></li>
                     <li class="list-group-item"><a href="">웹도 만들고싶고</a></li>
                     <li class="list-group-item"><a href="">앱도 만들고싶습니다</a></li>
@@ -99,7 +103,7 @@
         <div class="row">
             <div class="">
                 <h1>진행중인 프로젝트</h1>
-                <ul class="list-group">
+                <ul class="list-group" id="myProjects">
                     <li class="list-group-item"><a href="">게임도 만들고</a></li>
                     <li class="list-group-item"><a href="">웹도 만들고</a></li>
                     <li class="list-group-item"><a href="">앱도 만듭니다</a></li>
@@ -113,6 +117,70 @@
 <script src="js/bootstrap.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<script>
+	const nicknameLbl = $('#nameLbl');
+	const emailLbl = $('#emailLbl');
+	const phoneLbl = $('#phoneLbl');
+	const applyProjects = $('#applyProjects');
+	const myProjects = $('#myProjects');
 
+	$.ajax({
+		type: 'get',
+		url: './api/user/',
+		dataType: 'json',
+		async: false,
+		success: (data) => {
+			// 받은 유저 정보를 출력
+			nicknameLbl.text(data.nickname);
+			emailLbl.text(data.email);
+			phoneLbl.text(data.phone);
+		},
+		error: () => {
+			alert('세션이 만료되었습니다.');
+			window.location = './signIn.html';
+		}
+	});
+
+	$.ajax({
+		type: 'get',
+		url: './api/project/list/present',
+		dataType: 'json',
+		async: false,
+		success: (data) => {
+			const nickname = nicknameLbl.text();
+			myProjects.empty();
+			data.map((project) => {
+				console.log(`${project.organizer.nickname}, ${nickname}`);
+				if (project.organizer.nickname == nickname) {
+					myProjects.append(`<li class="list-group-item"><a href="./projectFix.html?no=${ project.no }?">${ project.title }</a></li>`);
+				}
+				else {
+					myProjects.append(`<li class="list-group-item"><a href="./project.html?no=${ project.no }&check=y">${ project.title }</a></li>`);
+				}
+			});
+		},
+		error: () => {
+			alert('세션이 만료되었습니다.');
+			window.location = './signIn.html';
+		}
+	});
+
+	$.ajax({
+		type: 'get',
+		url: './api/project/list/apply',
+		dataType: 'json',
+		async: false,
+		success: (data) => {
+			applyProjects.empty();
+			data.map((project) => {
+				applyProjects.append(`<li class="list-group-item"><a href="./project.html?no=${ project.no }?check=n">${ project.title }</a></li>`);
+			});
+		},
+		error: () => {
+			alert('세션이 만료되었습니다.');
+			window.location = './signIn.html';
+		}
+	});
+</script>
 </body>
 </html>
