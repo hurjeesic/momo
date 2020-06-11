@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width initial-scale=1">
-    <title>게시판</title>
+    <title>마이페이지</title>
     <link rel="stylesheet" href="css/bootstrap.css">
     <style type="text/css">
         .jumbotron {
@@ -64,24 +64,53 @@
             <div class="col-sm-offset-1 col-sm-10">
                 <table class="table mt-3">
                     <tbody>
-                    <tr>
-                        <th>닉네임</th>
-                        <th id="nameLbl">고재우</th>
-                    </tr>
-                    <tr>
-                        <th>이메일</th>
-                        <th id="emailLbl">cake427@naver.com</th>
-                    </tr>
-                    <tr>
-                        <th>전화번호</th>
-                        <th id="phoneLbl">010-4440-2351</th>
-                    </tr>
+                        <tr>
+                            <th>닉네임</th>
+                            <th id="nameLbl">고재우</th>
+                        </tr>
+                        <tr>
+                            <th>이메일</th>
+                            <th id="emailLbl">cake427@naver.com</th>
+                        </tr>
+                        <tr>
+                            <th>전화번호</th>
+                            <th id="phoneLbl">010-4440-2351</th>
+                        </tr>
+                        <tr>
+                            <th>
+                                <button type="button">포트폴리오</button>
+                            </th>
+                            <td></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-    <button type="button">포트폴리오</button>
+    <div class="container col-md-5">
+        <div class="row">
+            <div class="">
+                <h1>신청한 프로젝트</h1>
+                <ul class="list-group">
+                    <li class="list-group-item"><a href="">게임도 만들고싶고</a></li>
+                    <li class="list-group-item"><a href="">웹도 만들고싶고</a></li>
+                    <li class="list-group-item"><a href="">앱도 만들고싶습니다</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container col-sm-offset-1 col-md-5">
+        <div class="row">
+            <div class="">
+                <h1>진행중인 프로젝트</h1>
+                <ul class="list-group">
+                    <li class="list-group-item"><a href="">게임도 만들고</a></li>
+                    <li class="list-group-item"><a href="">웹도 만들고</a></li>
+                    <li class="list-group-item"><a href="">앱도 만듭니다</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
@@ -100,7 +129,6 @@
 		async: false,
 		success: (data) => {
 			// 받은 유저 정보를 출력
-			console.log(data);
             nameLbl.text(data.nickname);
             emailLbl.text(data.email);
             phoneLbl.text(data.phone);
