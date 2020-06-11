@@ -66,11 +66,6 @@
 
         <div class=" container input-group input-group-lg" id="employees">
             <h4><b>인원</b></h4>
-            <div class="col-sm-6 input-group">
-                <input type="hidden">
-                <input type="text" placeholder="직군">
-                <input type="number" min="1" placeholder="인원 수">
-            </div>
         </div>
 
         <div class="container input-group input-group-lg">
@@ -83,8 +78,8 @@
         <div class=" container input-group input-group-lg">
             <h4><b>기간</b></h4>
             <div class="col-sm-3">
-                <input type="text" id="datePicker1" class="form-control" value="2019-06-27">
-                <input type="text" id="datePicker2" class="form-control" value="2019-06-27">
+                <input type="date" name="start" id="startDate" class="form-control">
+                <input type="date" name="end" id="endDate" class="form-control">
             </div><!--이부분은 데이트픽커 라는 친구를 쓸껀데 아직 보는중이에요-->
         </div>
 
@@ -128,16 +123,17 @@
 <script src="js/bootstrap.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
-<!--<script src="resources/js/plugin/datepicker/bootstrap-datepicker.js"></script>-->
-<!--<script src="resources/js/plugin/datepicker/bootstrap-datepicker.ko.min.js"></script>-->
+<script src="./myLibrary.js"></script>
 <script>
 	const employees = $('#employees');
-	const fields = [employees.children(':last')];
+	const fields = [];
 	const updateBtn = $('#updateBtn');
 	const cancelBtn = $('#cancelBtn');
 	const titleTxt = $('#titleTxt');
 	const contentTxt = $('#contentTxt');
 	const myFieldTxt = $('#myFieldTxt');
+	const startDate = $('#startDate');
+	const endDate = $('#endDate');
 	const params = getParameters();
 	let bSession = true;
 
@@ -160,59 +156,54 @@
 		async: false,
 		success: (data) => {
 			// 받은 유저 정보를 출력
-
-			$.ajax({
-				type: 'get',
-				url: `./api/project/${ parseInt(params.no) }`,
-				dataType: 'json',
-				async: false,
-				success: (data) => {
-					$('form').append(`<input type="hidden" name="no" value="${ data.no }">`);
-					titleTxt.val(data.title);
-					contentTxt.val(data.content);
-					$(`input:radio[name="process"]:radio[value="${ data.process }"]`).prop('checked', true);
-					$(`input:radio[name="apply"]:radio[value="${ data.apply }"]`).prop('checked', true);
-
-					$.ajax({
-						type: 'get',
-						url: './api/member/',
-						dataType: 'json',
-						data: { projectNo: parseInt(params.no) },
-						async: false,
-						success: (data) => {
-							myFieldTxt.val(data.field.field);
-
-							$.ajax({
-								type: 'get',
-								url: `./api/applyField/list/${ parseInt(params.no) }`,
-								dataType: 'json',
-								async: false,
-								success: (datas) => {
-									fields[0].children('input[type=hidden]').val(datas[0].no);
-									fields[0].children('input[type=text]').val(datas[0].field);
-									fields[0].children('input[type=number]').val(datas[0].number);
-									for (let i = 1; i < datas.length; i++) {
-										employees.append(`<div class="col-sm-6 input-group"><input type="hidden" value="${ datas[i].no }">` +
-											`<input type="text" placeholder="직군" value="${ datas[i].field }"><input type="number" min="1" placeholder="인원 수" value="${ datas[i].number }"></div>`);
-										fields.push(employees.children(':last'));
-									}
-								},
-								error: () => bSession = false
-							});
-						},
-						error: () => bSession = false
-					});
-				},
-				error: () => bSession = false
-			});
 		},
-		error: () => bSession = false
+		error: () => {
+			alert('세션이 만료되었습니다.');
+			window.location = './signIn.html';
+		}
 	});
 
-	if (!bSession) {
-		alert('세션이 만료되었습니다.');
-		window.location = './signIn.html';
-	}
+	$.ajax({
+		type: 'get',
+		url: `./api/project/${ params.no }`,
+		dataType: 'json',
+		async: false,
+		success: (obj) => {
+			const presentNumbers = {};
+
+			$('form').append(`<input type="hidden" name="no" value="${ obj.project.no }">`);
+			titleTxt.val(obj.project.title);
+
+			obj.members.forEach((member) => { // 현재 인원 현황
+				const field = member.field.field;
+				presentNumbers[field] = presentNumbers.hasOwnProperty(field) ? presentNumbers[field] + 1 : 1;
+
+				if (member.user.nickname == obj.project.organizer.nickname) {
+                    myFieldTxt.val(field);
+                }
+			});
+
+			obj.applyFields.forEach((field) => {
+				if (!presentNumbers.hasOwnProperty(field)) {
+					presentNumbers[field] = 1;
+				}
+
+				employees.append(`<div class="col-sm-6 input-group"><input type="hidden" value="${ field.no }">` +
+					`<input type="text" placeholder="직군" value="${ field.field }"><input type="number" min="${ presentNumbers[field] }" placeholder="인원 수" value="${ field.number }"></div>`);
+				fields.push(employees.children(':last'));
+			});
+
+			startDate.val(new Date(obj.project.start).format('yyyy-MM-dd'));
+			endDate.val(new Date(obj.project.end).format('yyyy-MM-dd'));
+			contentTxt.val(obj.project.content);
+			$(`input:radio[name="process"]:radio[value="${ obj.project.process }"]`).prop('checked', true);
+			$(`input:radio[name="apply"]:radio[value="${ obj.project.apply }"]`).prop('checked', true);
+		},
+		error: () => {
+			alert('세션이 만료되었습니다.');
+			window.location = './signIn.html';
+		}
+	});
 
 	updateBtn.on('click', () => {
 		// 프로젝트 생성
@@ -268,7 +259,7 @@
 						async: false,
 						success: (data) => {
 							alert('프로젝트가 수정되었습니다.');
-							window.location = './index.html';
+							window.location = './mypage.html';
 						},
 						error: () => {
 							alert('세션이 만료되었습니다.');
