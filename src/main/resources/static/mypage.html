@@ -16,6 +16,7 @@
         .dropdown:hover > .dropdown-menu {
             display: block;
         }
+
         .main-area {
             border: 1px solid #ccc;
             border-radius: 10px;
@@ -63,18 +64,18 @@
             <div class="col-sm-offset-1 col-sm-10">
                 <table class="table mt-3">
                     <tbody>
-                        <tr>
-                            <th>이름</th>
-                            <th>고재우</th>
-                        </tr>
-                        <tr>
-                            <th>이메일</th>
-                            <th>cake427@naver.com</th>
-                        </tr>
-                        <tr>
-                            <th>전화번호</th>
-                            <th>010-4440-2351</th>
-                        </tr>
+                    <tr>
+                        <th>닉네임</th>
+                        <th id="nameLbl">고재우</th>
+                    </tr>
+                    <tr>
+                        <th>이메일</th>
+                        <th id="emailLbl">cake427@naver.com</th>
+                    </tr>
+                    <tr>
+                        <th>전화번호</th>
+                        <th id="phoneLbl">010-4440-2351</th>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -87,6 +88,28 @@
 <script src="js/bootstrap.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<script>
+	const nameLbl = $('#nameLbl');
+	const emailLbl = $('#emailLbl');
+	const phoneLbl = $('#phoneLbl');
 
+	$.ajax({
+		type: 'get',
+		url: './api/user/',
+		dataType: 'json',
+		async: false,
+		success: (data) => {
+			// 받은 유저 정보를 출력
+			console.log(data);
+            nameLbl.text(data.nickname);
+            emailLbl.text(data.email);
+            phoneLbl.text(data.phone);
+		},
+		error: () => {
+			alert('세션이 만료되었습니다.');
+			window.location = './signIn.html';
+		}
+	});
+</script>
 </body>
 </html>
