@@ -44,7 +44,7 @@ public class ProjectRestController {
 
 		for (int i = 0; i < allProject.size(); i++) {
 			if (memberJpaRepository.findByProjectAndUser(allProject.get(i), user).isPresent() ||
-				applicantJpaRepository.findByProjectAndUser(allProject.get(i).getNo(), user.getNo()).isPresent()) {
+				applicantJpaRepository.findByProjectAndUser(allProject.get(i), user).isPresent()) {
 				allProject.remove(i--);
 			}
 		}
@@ -107,7 +107,7 @@ public class ProjectRestController {
 		List<Project> myAllProject = projectJpaRepository.findAllByOrganizerNot(user);
 
 		for (int i = 0; i < myAllProject.size(); i++) {
-			if (!applicantJpaRepository.findByProjectAndUser(myAllProject.get(i).getNo(), user.getNo()).isPresent()) {
+			if (!applicantJpaRepository.findByProjectAndUser(myAllProject.get(i), user).isPresent()) {
 				myAllProject.remove(i--);
 			}
 		}

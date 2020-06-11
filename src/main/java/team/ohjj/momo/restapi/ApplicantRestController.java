@@ -1,21 +1,27 @@
 package team.ohjj.momo.restapi;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import team.ohjj.momo.domain.Applicant;
+import team.ohjj.momo.domain.Project;
 import team.ohjj.momo.domain.User;
 import team.ohjj.momo.entity.ApplicantJpaRepository;
 import team.ohjj.momo.entity.ApplyFieldJpaRepository;
 import team.ohjj.momo.entity.ProjectJpaRepository;
+import team.ohjj.momo.entity.UserJpaRepository;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/api/applicant")
 public class ApplicantRestController {
+	@Autowired
+	UserJpaRepository userJpaRepository;
+
 	@Autowired
 	ProjectJpaRepository projectJpaRepository;
 
@@ -25,11 +31,22 @@ public class ApplicantRestController {
 	@Autowired
 	ApplicantJpaRepository applicantJpaRepository;
 
+	@GetMapping("/")
+	public List<Applicant> getApplicantList(@ModelAttribute Project project) {
+		return applicantJpaRepository.findAllByProject(project);
+	}
+
 	@PostMapping("/insert")
 	public Boolean createApplicant(HttpSession session, @ModelAttribute Applicant applicant) {
-		applicant.setUser(((User)session.getAttribute("user")).getNo());
+		applicant.setUser(((User)session.getAttribute("user")));
 
 		applicantJpaRepository.save(applicant);
+
+		return true;
+	}
+
+	public Boolean deleteApplicant(HttpSession session, int applicantNo) {
+		applicantJpaRepository.deleteById(applicantNo);
 
 		return true;
 	}
