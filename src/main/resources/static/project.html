@@ -26,6 +26,7 @@
         .noresize {
             resize: none; /* 사용자 임의 변경 불가 */
         }
+
         .main-area {
             border: 1px solid #ccc;
             border-radius: 10px;
@@ -74,9 +75,6 @@
                     <div class=" col-sm-8">
                         <h1 id="title">
                             게임만들기
-                            <button type="button" class="btn btn-primary btn-lg" id="">
-                                채팅방
-                            </button>
                         </h1>
 
                     </div>
@@ -94,7 +92,7 @@
                     <div class="col-sm-1" id="number">
                         6 / 2
                     </div>
-                    <button type="button" class="">인원관리</button>
+                    <button id="applicantBtn">지원자 확인</button>
                 </div>
                 <hr style="border: solid 1px ;">
 
@@ -117,7 +115,8 @@
                 <div class="container input-group input-group-lg">
                     <h4><b>세부내용</b></h4>
                     <div class="col-sm-6">
-                        <textarea class="form-control col-sm-5 noresize" id="content" rows="10" cols="30" disabled></textarea>
+                        <textarea class="form-control col-sm-5 noresize" id="content" rows="10" cols="30"
+                                  disabled></textarea>
                     </div>
                 </div>
             </div>
@@ -125,9 +124,9 @@
                 <div class="row">
                     <div class="">
                         <h3>세부인원</h3>
-                        <ul class="list-group">
-                            <li class="list-group-item">&nbsp; 고재우  <b class="pull-right">디자인&nbsp;</b></li>
-                            <li class="list-group-item">&nbsp; 허지식  <b class="pull-right">개발진&nbsp;</b></li>
+                        <ul class="list-group" id="members">
+                            <li class="list-group-item">&nbsp; 고재우 <b class="pull-right">디자인&nbsp;</b></li>
+                            <li class="list-group-item">&nbsp; 허지식 <b class="pull-right">개발진&nbsp;</b></li>
                         </ul>
                     </div>
                 </div>
@@ -178,11 +177,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
 <script src="js/myLibrary.js"></script>
 <script>
+	const members = $('#members');
 	const openModalBtn = $('#openModalBtn');
 	const closeModalBtn = $('#closeModalBtn');
 	const fields = $('#fields');
 	const applyBtn = $('#applyBtn');
+	const applicantBtn = $('#applicantBtn');
 	const params = getParameters();
+	let username = '';
 
 	$.ajax({
 		type: 'get',
@@ -191,6 +193,7 @@
 		async: false,
 		success: (data) => {
 			// 받은 유저 정보를 출력
+			username = data.nickname;
 		},
 		error: () => {
 			alert('세션이 만료되었습니다.');
@@ -213,12 +216,36 @@
 
 			$('#title').val(data.project.title);
 			$('#organizer').val(data.project.organizer.nickname);
+			if (username == data.project.organizer.nickname) {
+				applicantBtn.on('click', (e) => {
+					e.preventDefault();
+					window.location = `./volunteerCheck.html?no=${ data.project.no }`;
+				});
 
+				applyBtn.val('수정하기');
+				applyBtn.on('click', (e) => {
+					e.preventDefault();
+					window.location = `./projectFix.html?no=${ data.project.no }`;
+				});
+			}
+			else {
+				applicantBtn.remove();
+			}
 
+			members.empty();
 			for (const member of data.members) { // 현재 인원 현황
 				const field = member.field.field;
+				members.append(`<li class="list-group-item">&nbsp; ${ member.user.nickname } <b class="pull-right">${ field }&nbsp;</b></li>`);
 				presentNumbers[field] = presentNumbers.hasOwnProperty(field) ? presentNumbers[field] + 1 : 1;
 				presentNumber++;
+				if (username == member.user.nickname) {
+					$('#title').append('<button type="button" class="btn btn-primary btn-lg" id="chatBtn">채팅방</button>');
+					$('#chatBtn').on('click', (e) => {
+						e.preventDefault();
+						sessionStorage.setItem('project.id', data.project.no);
+						window.location = `./chatRoom.html`;
+                    })
+                }
 			}
 
 			for (const applyField of data.applyFields) { // 전체 인원 현황
@@ -227,7 +254,7 @@
 				allNumbers[field] = applyField.number;
 				allNumber += applyField.number;
 
-				if (presentNumbers.hasOwnProperty(applyField.field)) {
+				if (!presentNumbers.hasOwnProperty(applyField.field)) {
 					presentNumbers[applyField.field] = 0;
 				}
 
@@ -248,7 +275,7 @@
 
 			item += '</div></div>';
 
-			$('#number').val(item);
+			$('#number').html(item);
 			$('#process').val(processList[data.project.process]);
 			$('#date').val(`${ data.project.start } ~ ${ data.project.end }`);
 			$('#content').val(data.project.content);
@@ -263,7 +290,7 @@
 		openModalBtn.text('확인');
 		openModalBtn.on('click', (e) => {
 			e.preventDefault();
-            window.location='./mypage.html';
+			window.location = './mypage.html';
 		});
 	}
 	else {

@@ -146,15 +146,9 @@
 		dataType: 'json',
 		async: false,
 		success: (data) => {
-			const nickname = nicknameLbl.text();
 			myProjects.empty();
 			data.map((project) => {
-				if (project.organizer.nickname == nickname) {
-					myProjects.append(`<li class="list-group-item"><a href="./projectFix.html?no=${ project.no }?">${ project.title }</a><button onclick="window.location='./volunteerCheck.html?no=${ project.no }'">지원자 확인</button></li>`);
-				}
-				else {
-					myProjects.append(`<li class="list-group-item"><a href="./project.html?no=${ project.no }&check=y">${ project.title }</a></li>`);
-				}
+                myProjects.append(`<li class="list-group-item"><a href="./project.html?no=${ project.no }&check=y">${ project.title }</a></li>`);
 			});
 		},
 		error: () => {
