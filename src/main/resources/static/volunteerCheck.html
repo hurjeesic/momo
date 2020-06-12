@@ -65,7 +65,6 @@
     <div class="row">
         <div class="col-md-9">
             <form>
-                <input type="hidden" name="project.no" id="projectNo">
                 <div class="">
                     <div class="table">
                         <table class="table table-hover results">
@@ -106,8 +105,10 @@
 <script src="js/myLibrary.js"></script>
 <script>
 	let username;
-	const confirmBtn = $("#confirmBtn");
+	const confirmBtn = $('#confirmBtn');
 	const params = getParameters();
+	const presentNumbers = {};
+	const allNumbers = {};
 
 	$.ajax({
 		type: 'get',
@@ -132,11 +133,6 @@
 		async: false,
 		success: (obj) => {
 			if (obj.project.organizer.nickname == username) {
-				const presentNumbers = {};
-				const allNumbers = {};
-
-				$('#projectNo').val(obj.project.no);
-
 				$('#title').val(obj.project.title);
 
 				for (const member of obj.members) { // 현재 인원 현황
@@ -196,7 +192,52 @@
 
 	confirmBtn.on('click', (e) => {
 		e.preventDefault();
-    });
+		const tempNumbers = {}, confirmList = [];
+		let failFields = '';
+		for (const key in presentNumbers) {
+			tempNumbers[key] = presentNumbers[key];
+		}
+
+		$('#applicants>tr>td>input[type=checkbox]:checked').each((index, item) => {
+			tempNumbers[$(item).parent().prev().text()]++;
+			confirmList.push(parseInt($(item).val()));
+		});
+
+
+		for (const key in tempNumbers) {
+			if (tempNumbers[key] > allNumbers[key]) {
+				failFields += `${ failFields == '' ? '' : ',' } ${ key }`;
+			}
+		}
+
+		if (failFields == '') {
+			$.ajax({
+				type: 'post',
+				url: `./api/applicant/complete`,
+				dataType: 'json',
+				data: { 'applicantNums': confirmList },
+				async: false,
+				success: (datas) => {
+					if (datas) {
+						// project, user, field
+						const users = [];
+						datas.forEach((data) => {
+							users.push(`${ data.user.nickname }님`);
+						});
+
+						alert(`${ users.join(', ') }이 승인되었습니다.`);
+						window.location = './mypage.html';
+					}
+					else {
+						alert('지원자 승인 권한이 없습니다.');
+					}
+				}
+			});
+		}
+		else {
+			alert(`${ key } 인원이 초과되었습니다.`);
+		}
+	});
 </script>
 </body>
 </html>
