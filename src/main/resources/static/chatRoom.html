@@ -39,7 +39,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="">모여모여게시판</a>
+            <a class="navbar-brand" href="./index.html">모여모여게시판</a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
@@ -255,12 +255,16 @@
 		});
 	}
 
-	messageTxt.keydown((key) => {
-		if (key.keyCode == 13) {
+	messageTxt.on('keydown', (e) => {
+		if (e.which == 13) {
+			e.preventDefault();
 			sendMessage(messageTxt);
 		}
 	});
-	sendBtn.click(() => sendMessage(messageTxt));
+	sendBtn.on('click', (e) => {
+		e.preventDefault();
+		sendMessage(messageTxt);
+	});
 
 	findRoomList(projectId);
 	connect();

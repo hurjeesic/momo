@@ -1,3 +1,15 @@
+function getParameters() {
+	const url = document.location.href;
+	const qs = url.substring(url.indexOf('?') + 1).split('&');
+	const result = {};
+	for (let i = 0; i < qs.length; i++) {
+		qs[i] = qs[i].split('=');
+		result[qs[i][0]] = decodeURIComponent(qs[i][1]);
+	}
+
+	return result;
+}
+
 Date.prototype.format = function (f) {
 	if (!this.valueOf()) {
 		return ' ';

@@ -35,7 +35,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="">모여모여게시판</a>
+            <a class="navbar-brand" href="./index.html">모여모여게시판</a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
@@ -149,9 +149,8 @@
 			const nickname = nicknameLbl.text();
 			myProjects.empty();
 			data.map((project) => {
-				console.log(`${project.organizer.nickname}, ${nickname}`);
 				if (project.organizer.nickname == nickname) {
-					myProjects.append(`<li class="list-group-item"><a href="./projectFix.html?no=${ project.no }?">${ project.title }</a></li>`);
+					myProjects.append(`<li class="list-group-item"><a href="./projectFix.html?no=${ project.no }?">${ project.title }</a><button onclick="window.location='./volunteerCheck.html?no=${ project.no }'">지원자 확인</button></li>`);
 				}
 				else {
 					myProjects.append(`<li class="list-group-item"><a href="./project.html?no=${ project.no }&check=y">${ project.title }</a></li>`);

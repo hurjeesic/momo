@@ -9,18 +9,25 @@ import lombok.ToString;
 import javax.persistence.*;
 
 @Entity
-@IdClass(ApplicantPK.class)
+@Table(name = "applicant", uniqueConstraints = @UniqueConstraint(columnNames = { "project", "user" }))
 @Getter
 @Setter
 @ToString
 public class Applicant {
 	@Id
-	@JsonIgnore
-	private int project;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@JsonProperty
+	private int no;
 
-	@Id
+	@JoinColumn(name = "project", nullable = false)
+	@ManyToOne(targetEntity = Project.class)
 	@JsonIgnore
-	private int user;
+	private Project project;
+
+	@JoinColumn(name = "user", nullable = false)
+	@ManyToOne(targetEntity = User.class)
+	@JsonProperty
+	private User user;
 
 	@JoinColumn(name = "field", nullable = false)
 	@ManyToOne(targetEntity = ApplyField.class)

@@ -93,7 +93,8 @@
 	codeCheckBtn.attr('disabled', true);
 	checkNickname.val(false);
 
-	emailBtn.on('click', () => {
+	emailBtn.on('click', (e) => {
+		e.preventDefault();
 		if (emailTxt.val() == '') {
 			alert('이메일을 입력해주세요.');
 			emailTxt.focus();
@@ -149,7 +150,8 @@
 		}
 	});
 
-	codeCheckBtn.on('click', () => {
+	codeCheckBtn.on('click', (e) => {
+		e.preventDefault();
 		if (codeTxt.val() == '') {
 			alert('인증 코드를 입력해주세요.');
 			codeTxt.focus();
@@ -180,7 +182,8 @@
 		}
 	});
 
-	nicknameCheckBtn.on('click', () => {
+	nicknameCheckBtn.on('click', (e) => {
+		e.preventDefault();
 		if (nicknameTxt.val() == '') {
 			alert('닉네임을 입력해주세요.');
 			nicknameTxt.focus();
@@ -212,7 +215,8 @@
 		}
 	});
 
-	signUpBtn.on('click', () => {
+	signUpBtn.on('click', (e) => {
+		e.preventDefault();
 		if (emailTxt.val() == '') {
 			alert('이메일을 입력해주세요.');
 		}
