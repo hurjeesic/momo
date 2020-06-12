@@ -36,7 +36,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="">모여모여게시판</a>
+            <a class="navbar-brand" href="./index.html">모여모여게시판</a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
@@ -145,7 +145,8 @@
 		}
 	});
 
-	fieldAddBtn.on('click', () => {
+	fieldAddBtn.on('click', (e) => {
+		e.preventDefault();
 		employees.append(`<div class="col-sm-6 input-group">` +
 			`<input type="text" placeholder="직군"><input type="number" min="1" placeholder="인원 수"></div>`);
 		fields.push(employees.children(':last'));
@@ -169,7 +170,8 @@
 		});
 	});
 
-	createBtn.on('click', () => {
+	createBtn.on('click', (e) => {
+		e.preventDefault();
 		// 프로젝트 생성
 		if (!titleTxt.val()) {
 			alert('프로젝트 제목을 입력해주세요.');
@@ -243,7 +245,8 @@
 		}
 	});
 
-	cancelBtn.on('click', () => {
+	cancelBtn.on('click', (e) => {
+		e.preventDefault();
 		window.location = './index.html';
 	});
 </script>

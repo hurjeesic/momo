@@ -129,11 +129,13 @@
 		}
 	});
 
-	$('#loginBtn').on('click', () => {
+	$('#loginBtn').on('click', (e) => {
+		e.preventDefault();
 		login();
 	});
 
-	$('#signUpBtn').on('click', () => {
+	$('#signUpBtn').on('click', (e) => {
+		e.preventDefault();
 		window.location = './signOn.html';
 	});
 </script>

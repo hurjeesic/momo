@@ -1,10 +1,7 @@
 package team.ohjj.momo.restapi;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import team.ohjj.momo.domain.Member;
 import team.ohjj.momo.domain.Project;
 import team.ohjj.momo.domain.User;
@@ -32,5 +29,14 @@ public class MemberRestController {
 		}
 
 		return null;
+	}
+
+	@PostMapping("/insert")
+	public Boolean createMember(HttpSession session, @ModelAttribute Member member) {
+		User user = (User)session.getAttribute("user");
+
+		memberJpaRepository.save(member);
+
+		return true;
 	}
 }

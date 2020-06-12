@@ -31,7 +31,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="">모여모여게시판</a>
+            <a class="navbar-brand" href="./index.html">모여모여게시판</a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
@@ -123,7 +123,7 @@
 <script src="js/bootstrap.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
-<script src="./myLibrary.js"></script>
+<script src="js/myLibrary.js"></script>
 <script>
 	const employees = $('#employees');
 	const fields = [];
@@ -135,19 +135,6 @@
 	const startDate = $('#startDate');
 	const endDate = $('#endDate');
 	const params = getParameters();
-	let bSession = true;
-
-	function getParameters() {
-		const url = document.location.href;
-		const qs = url.substring(url.indexOf('?') + 1).split('&');
-		const result = {};
-		for (let i = 0; i < qs.length; i++) {
-			qs[i] = qs[i].split('=');
-			result[qs[i][0]] = decodeURIComponent(qs[i][1]);
-		}
-
-		return result;
-	}
 
 	$.ajax({
 		type: 'get',
@@ -205,8 +192,9 @@
 		}
 	});
 
-	updateBtn.on('click', () => {
-		// 프로젝트 생성
+	updateBtn.on('click', (e) => {
+		e.preventDefault();
+		// 프로젝트 수정
 		if (!titleTxt.val()) {
 			alert('프로젝트 제목을 입력해주세요.');
 		}
@@ -275,7 +263,8 @@
 		}
 	});
 
-	cancelBtn.on('click', () => {
+	cancelBtn.on('click', (e) => {
+		e.preventDefault();
 		window.location = './index.html';
 	});
 </script>

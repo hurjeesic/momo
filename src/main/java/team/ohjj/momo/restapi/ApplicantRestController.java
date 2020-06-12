@@ -31,9 +31,9 @@ public class ApplicantRestController {
 	@Autowired
 	ApplicantJpaRepository applicantJpaRepository;
 
-	@GetMapping("/")
-	public List<Applicant> getApplicantList(@ModelAttribute Project project) {
-		return applicantJpaRepository.findAllByProject(project);
+	@GetMapping("/{no}")
+	public List<Applicant> getApplicantList(@PathVariable Integer no) {
+		return applicantJpaRepository.findAllByProject(projectJpaRepository.findById(no).get());
 	}
 
 	@PostMapping("/insert")
