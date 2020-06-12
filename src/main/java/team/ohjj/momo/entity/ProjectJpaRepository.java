@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface ProjectJpaRepository extends JpaRepository<Project, Integer> {
 	List<Project> findAllByOrganizerNot(User user);
+	List<Project> findAllByOrganizer(User user);
 }

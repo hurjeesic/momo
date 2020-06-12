@@ -54,7 +54,7 @@
             </ul>
 
             <ul class="nav navbar-nav pull-right">
-                <li class="active"><a href="">마이페이지 <span class="sr-only"></span></a></li>
+                <li class="active"><a href="./mypage.html">마이페이지<span class="sr-only"></span></a></li>
             </ul>
 
         </div>
@@ -128,6 +128,7 @@
                 </div>
             </div>
         </div>
+<<<<<<< HEAD
         <hr>
         <div>
             <div class="container">
@@ -164,6 +165,37 @@
                                         <button type="button" class="btn btn-primary" id="applyBtn">신청</button>
                                         <button type="button" class="btn btn-default" id="closeModalBtn">취소</button>
                                     </div>
+=======
+
+        <div class="container">
+            <div class="">
+                <div class="text-center">
+                    <!-- 모달을 열기 위한 버튼 -->
+                    <button type="button" class="btn btn-primary btn-lg" id="openModalBtn">
+                        신청하기
+                    </button>
+                    <!-- 모달 영역 -->
+                    <div id="modalBox" class="modal fade" id="myModal" tabindex="-1" role="dialog"
+                         aria-labelledby="myModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                            aria-hidden="true">×</span></button>
+                                    <h4 class="modal-title" id="myModalLabel">자기소개</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <textarea name="content" class="form-control col-sm-5 noresize" rows="10"
+                                              cols="30"></textarea>
+                                </div>
+                                <br>
+                                <div class="modal-footer">
+                                    <div class="pull-left">
+                                        <select name="field.no" id="fields"></select>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" id="applyBtn">신청</button>
+                                    <button type="button" class="btn btn-default" id="closeModalBtn">취소</button>
+>>>>>>> ce9b626cbd1008532f7ec4b09dbf6d254e1aa314
                                 </div>
                             </div>
                         </div>
@@ -198,6 +230,7 @@
 		return result;
 	}
 
+<<<<<<< HEAD
 	// $.ajax({
 	// 	type: 'get',
 	// 	url: './api/user/',
@@ -276,35 +309,118 @@
 	// 		window.location = './signIn.html';
 	// 	}
 	// });
-
-	// 모달 버튼에 이벤트를 건다.
-	openModalBtn.on('click', function () {
-		$('#modalBox').modal('show');
+=======
+	$.ajax({
+		type: 'get',
+		url: './api/user/',
+		dataType: 'json',
+		async: false,
+		success: (data) => {
+			// 받은 유저 정보를 출력
+		},
+		error: () => {
+			alert('세션이 만료되었습니다.');
+			window.location = './signIn.html';
+		}
 	});
 
-	// 모달 안의 취소 버튼에 이벤트를 건다.
-	closeModalBtn.on('click', function () {
-		$('#modalBox').modal('hide');
-	});
+	$.ajax({
+		type: 'get',
+		url: `./api/project/${ params.no }`,
+		dataType: 'json',
+		async: false,
+		success: (data) => {
+			const presentNumbers = {};
+			const allNumbers = {};
+			const processList = ['모집중', '진행중', '완료'];
+			let presentNumber = 0, allNumber = 0;
 
-	applyBtn.on('click', function () {
-		$.ajax({
-			type: 'post',
-			url: `./api/applicant/insert`,
-			dataType: 'json',
-			data: $('form').serialize(),
-			async: false,
-			success: (data) => {
-				alert('신청이 완료되었습니다.');
-				window.location = './index.html';
-			},
-			error: (request) => {
-				alert(request.status);
-				alert('세션이 만료되었습니다.');
-				window.location = './signIn.html';
+			$('#projectNo').val(data.project.no);
+
+			$('#title').val(data.project.title);
+			$('#organizer').val(data.project.organizer.nickname);
+
+
+			for (const member of data.members) { // 현재 인원 현황
+				const field = member.field.field;
+				presentNumbers[field] = presentNumbers.hasOwnProperty(field) ? presentNumbers[field] + 1 : 1;
+				presentNumber++;
 			}
-		});
+
+			for (const applyField of data.applyFields) { // 전체 인원 현황
+				const field = applyField.field;
+
+				allNumbers[field] = applyField.number;
+				allNumber += applyField.number;
+
+				if (presentNumbers.hasOwnProperty(applyField.field)) {
+					presentNumbers[applyField.field] = 0;
+				}
+
+				if (allNumbers[field] - presentNumbers[field] != 0) {
+					fields.append(`<option value="${ applyField.no }" >${ field }</option>`);
+				}
+			}
+
+			let item = `<div class="dropdown">${ presentNumber } / ${ allNumber }` +
+				'<span class="pull-right">▽</span>' +
+				'<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">';
+
+			for (const field in allNumbers) {
+				item += `${ field } ${ presentNumbers[field] } / ${ allNumbers[field] }<br>`;
+			}
+
+			item = item.substr(0, item.length - 4);
+
+			item += '</div></div>';
+
+			$('#number').val(item);
+			$('#process').val(processList[data.project.process]);
+			$('#date').val(`${ data.project.start } ~ ${ data.project.end }`);
+			$('#content').val(data.project.content);
+		},
+		error: () => {
+			alert('세션이 만료되었습니다.');
+			window.location = './signIn.html';
+		}
 	});
+>>>>>>> ce9b626cbd1008532f7ec4b09dbf6d254e1aa314
+
+	if (params.check) {
+		openModalBtn.text('확인');
+		openModalBtn.on('click', function () {
+            window.location='./mypage.html';
+		});
+	}
+	else {
+		// 모달 버튼에 이벤트를 건다.
+		openModalBtn.on('click', function () {
+			$('#modalBox').modal('show');
+		});
+
+		// 모달 안의 취소 버튼에 이벤트를 건다.
+		closeModalBtn.on('click', function () {
+			$('#modalBox').modal('hide');
+		});
+
+		applyBtn.on('click', function () {
+			$.ajax({
+				type: 'post',
+				url: `./api/applicant/insert`,
+				dataType: 'json',
+				data: $('form').serialize(),
+				async: false,
+				success: (data) => {
+					alert('신청이 완료되었습니다.');
+					window.location = './index.html';
+				},
+				error: () => {
+					alert('세션이 만료되었습니다.');
+					window.location = './signIn.html';
+				}
+			});
+		});
+	}
 </script>
 </body>
 </html>
