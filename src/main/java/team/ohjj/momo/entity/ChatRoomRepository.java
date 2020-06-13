@@ -71,4 +71,13 @@ public class ChatRoomRepository {
     public ChannelTopic getTopic(String roomId) {
         return topics.get(roomId);
     }
+
+    public void leaveChatRoom(String roomId) {
+        ChannelTopic topic = topics.get(roomId);
+
+        if (topic != null) {
+            redisMessageListenerContainer.removeMessageListener(redisSubscriber, topic);
+            topics.remove(roomId);
+        }
+    }
 }

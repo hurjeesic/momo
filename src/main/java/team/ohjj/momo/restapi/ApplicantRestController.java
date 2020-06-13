@@ -52,6 +52,7 @@ public class ApplicantRestController {
 						member.setProject(applicant.getProject());
 						member.setUser(applicant.getUser());
 						member.setField(applicant.getField());
+						member.setComplete(false);
 						confirmMembers.add(memberJpaRepository.save(member));
 					}
 					catch (Exception e) {

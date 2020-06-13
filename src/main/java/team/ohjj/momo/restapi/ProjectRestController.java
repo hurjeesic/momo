@@ -90,7 +90,7 @@ public class ProjectRestController {
 	@GetMapping("/list/present")
 	public List<Project> getMyProjectList(HttpSession session) {
 		User user = (User)session.getAttribute("user");
-		List<Project> myAllProject = projectJpaRepository.findAllByOrganizer(user);
+		List<Project> myAllProject = projectJpaRepository.findAll();
 
 		for (int i = 0; i < myAllProject.size(); i++) {
 			if (!memberJpaRepository.findByProjectAndUser(myAllProject.get(i), user).isPresent()) {
@@ -130,6 +130,7 @@ public class ProjectRestController {
 			applyFieldJpaRepository.save(applyField);
 			if (applyField.getField().equals(field)) {
 				member.setField(applyField);
+				member.setComplete(false);
 				memberJpaRepository.save(member);
 			}
 		}
@@ -152,6 +153,7 @@ public class ProjectRestController {
 			applyFieldJpaRepository.save(applyField);
 			if (applyField.getField().equals(field)) {
 				member.setField(applyField);
+				member.setComplete(false);
 				memberJpaRepository.save(member);
 			}
 		}
@@ -174,5 +176,10 @@ public class ProjectRestController {
 		}
 
 		return false;
+	}
+
+	@PostMapping("/complete/{no}")
+	public Boolean completeProject(HttpSession session, @PathVariable Integer no) {
+		return true;
 	}
 }
