@@ -180,6 +180,29 @@ public class ProjectRestController {
 
 	@PostMapping("/complete/{no}")
 	public Boolean completeProject(HttpSession session, @PathVariable Integer no) {
+		User user = (User)session.getAttribute("user");
+		Project project = projectJpaRepository.findById(no).get();
+
+		if (user.equals(project.getOrganizer())) {
+			List<Member> members = memberJpaRepository.findAllByProject(project);
+			Member organizer = memberJpaRepository.findByProjectAndUser(project, user).get();
+			members.remove(organizer);
+			for (Member member : members) {
+				if (!member.isComplete()) {
+					return false;
+				}
+			}
+
+			organizer.setComplete(true);
+			memberJpaRepository.save(organizer);
+			project.setComplete(true);
+			projectJpaRepository.save(project);
+		}
+		else {
+			return false;
+		}
+
+
 		return true;
 	}
 }

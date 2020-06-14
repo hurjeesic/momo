@@ -50,4 +50,8 @@ public class Project implements Serializable {
     @Column
     @JsonProperty
     private byte apply;
+
+    @Column
+    @JsonProperty
+    private boolean complete;
 }

@@ -132,7 +132,7 @@
 	const chatUserList = $('#chatUserList');
 	const title = $('#title');
 	const sendBtn = $('#sendBtn');
-	let username, memberNo;
+	let username, complete;
 
 	$.ajax({
 		type: 'get',
@@ -151,6 +151,16 @@
 
 	$.ajax({
 		type: 'get',
+		url: `./api/project/${ projectId }`,
+		dataType: 'json',
+		async: false,
+		success: (data) => {
+			complete = data.project.complete;
+        }
+    })
+
+	$.ajax({
+		type: 'get',
 		url: `./api/member/list/${ projectId }`,
 		dataType: 'json',
 		async: false,
@@ -158,15 +168,15 @@
 			chatUserList.empty();
 			members.forEach((member) => {
 				let item = `<li class="list-group-item">${ member.user.nickname }`;
-				if (username == member.user.nickname) {
-					memberNo = member.no;
-					if (member.user.nickname == member.project.organizer.nickname) {
+				const memberName = member.user.nickname;
+				if (!complete && username == memberName) {
+					if (memberName == member.project.organizer.nickname) {
 						item += `<button type="button" class="pull-right" id="completeBtn">완료</button>`;
 						chatUserList.append(item);
 						$('#completeBtn').on('click', (e) => {
 							e.preventDefault();
 							$.ajax({
-								type: 'get',
+								type: 'post',
 								url: `./api/project/complete/${ projectId }`,
 								dataType: 'json',
 								async: false,
@@ -189,19 +199,21 @@
 						item += `<input type="checkbox" class="pull-right" id="completeBox" value="1" ${ member.complete ? 'checked' : '' }></li>`;
 						chatUserList.append(item);
 						$('#completeBox').on('click', (e) => {
-							console.log("change!");
 							const bComplete = $('#completeBox').is(':checked');
 							sendComplete(bComplete);
 						});
 					}
 				}
-				else if (member.user.nickname != member.project.organizer.nickname) {
-					item += `<input class="pull-right" type="checkbox" disabled ${ member.complete ? 'checked' : '' }></li>`;
+				else {
+					if (complete || memberName != member.project.organizer.nickname) {
+						item += `<input class="pull-right" type="checkbox" disabled ${ member.complete ? 'checked' : '' }></li>`;
+					}
+                    else {
+                    	item += '</li>';
+                    }
+
 					chatUserList.append(item);
 				}
-                else {
-					chatUserList.append(item);
-                }
 			});
 		},
 		error: () => {
