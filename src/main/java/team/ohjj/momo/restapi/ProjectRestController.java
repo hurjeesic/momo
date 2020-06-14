@@ -26,6 +26,9 @@ public class ProjectRestController {
 	@Autowired
 	ApplicantJpaRepository applicantJpaRepository;
 
+	@Autowired
+	PortfolioJpaRepository portfolioJpaRepository;
+
 	private final Integer unitCount = 10;
 
 	@GetMapping("/count")
@@ -90,7 +93,7 @@ public class ProjectRestController {
 	@GetMapping("/list/present")
 	public List<Project> getMyProjectList(HttpSession session) {
 		User user = (User)session.getAttribute("user");
-		List<Project> myAllProject = projectJpaRepository.findAll();
+		List<Project> myAllProject = projectJpaRepository.findAllByComplete(false);
 
 		for (int i = 0; i < myAllProject.size(); i++) {
 			if (!memberJpaRepository.findByProjectAndUser(myAllProject.get(i), user).isPresent()) {
@@ -104,10 +107,39 @@ public class ProjectRestController {
 	@GetMapping("/list/apply")
 	public List<Project> getMyApplyProjectList(HttpSession session) {
 		User user = (User)session.getAttribute("user");
-		List<Project> myAllProject = projectJpaRepository.findAllByOrganizerNot(user);
+		List<Project> myAllProject = projectJpaRepository.findAllByOrganizerNotAndComplete(user, false);
 
 		for (int i = 0; i < myAllProject.size(); i++) {
 			if (!applicantJpaRepository.findByProjectAndUser(myAllProject.get(i), user).isPresent()) {
+				myAllProject.remove(i--);
+			}
+		}
+
+		return myAllProject;
+	}
+
+	@GetMapping("/list/complete")
+	public List<Project> getMyCompletedProjectList(HttpSession session) {
+		User user = (User)session.getAttribute("user");
+		List<Project> myAllProject = projectJpaRepository.findAllByComplete(true);
+
+		for (int i = 0; i < myAllProject.size(); i++) {
+			if (!memberJpaRepository.findByProjectAndUser(myAllProject.get(i), user).isPresent()) {
+				myAllProject.remove(i--);
+			}
+		}
+
+		return myAllProject;
+	}
+
+	@GetMapping("/list/complete/portfolio")
+	public List<Project> getMyCompletedProjectListForPortfolio(HttpSession session) {
+		User user = (User)session.getAttribute("user");
+		List<Project> myAllProject = projectJpaRepository.findAllByComplete(true);
+
+		for (int i = 0; i < myAllProject.size(); i++) {
+			if (!memberJpaRepository.findByProjectAndUser(myAllProject.get(i), user).isPresent() ||
+				portfolioJpaRepository.findByProjectAndUser(myAllProject.get(i), user).isPresent()) {
 				myAllProject.remove(i--);
 			}
 		}
