@@ -181,22 +181,14 @@ public class ProjectRestController {
 
 		Member member = memberJpaRepository.findByProjectAndUser(project, user).get();
 		for (ApplyField applyField : applyFields.getApplyFieldList()) {
-			applyField.setProject(project);
 			applyFieldJpaRepository.save(applyField);
 			if (applyField.getField().equals(field)) {
 				member.setField(applyField);
-				member.setComplete(false);
 				memberJpaRepository.save(member);
 			}
 		}
 
-		if (session.getAttribute("user") != null) {
-			projectJpaRepository.save(project);
-
-			return true;
-		}
-
-		return false;
+		return true;
 	}
 
 	@DeleteMapping("/delete")
