@@ -31,4 +31,8 @@ public class Member {
 	@ManyToOne(targetEntity = ApplyField.class)
 	@JsonProperty
 	private ApplyField field;
+
+	@Column(nullable = false)
+	@JsonProperty
+	private boolean complete;
 }

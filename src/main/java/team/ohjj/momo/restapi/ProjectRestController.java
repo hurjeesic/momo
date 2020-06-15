@@ -26,6 +26,9 @@ public class ProjectRestController {
 	@Autowired
 	ApplicantJpaRepository applicantJpaRepository;
 
+	@Autowired
+	PortfolioJpaRepository portfolioJpaRepository;
+
 	private final Integer unitCount = 10;
 
 	@GetMapping("/count")
@@ -90,7 +93,7 @@ public class ProjectRestController {
 	@GetMapping("/list/present")
 	public List<Project> getMyProjectList(HttpSession session) {
 		User user = (User)session.getAttribute("user");
-		List<Project> myAllProject = projectJpaRepository.findAllByOrganizer(user);
+		List<Project> myAllProject = projectJpaRepository.findAllByComplete(false);
 
 		for (int i = 0; i < myAllProject.size(); i++) {
 			if (!memberJpaRepository.findByProjectAndUser(myAllProject.get(i), user).isPresent()) {
@@ -104,10 +107,39 @@ public class ProjectRestController {
 	@GetMapping("/list/apply")
 	public List<Project> getMyApplyProjectList(HttpSession session) {
 		User user = (User)session.getAttribute("user");
-		List<Project> myAllProject = projectJpaRepository.findAllByOrganizerNot(user);
+		List<Project> myAllProject = projectJpaRepository.findAllByOrganizerNotAndComplete(user, false);
 
 		for (int i = 0; i < myAllProject.size(); i++) {
 			if (!applicantJpaRepository.findByProjectAndUser(myAllProject.get(i), user).isPresent()) {
+				myAllProject.remove(i--);
+			}
+		}
+
+		return myAllProject;
+	}
+
+	@GetMapping("/list/complete")
+	public List<Project> getMyCompletedProjectList(HttpSession session) {
+		User user = (User)session.getAttribute("user");
+		List<Project> myAllProject = projectJpaRepository.findAllByComplete(true);
+
+		for (int i = 0; i < myAllProject.size(); i++) {
+			if (!memberJpaRepository.findByProjectAndUser(myAllProject.get(i), user).isPresent()) {
+				myAllProject.remove(i--);
+			}
+		}
+
+		return myAllProject;
+	}
+
+	@GetMapping("/list/complete/portfolio")
+	public List<Project> getMyCompletedProjectListForPortfolio(HttpSession session) {
+		User user = (User)session.getAttribute("user");
+		List<Project> myAllProject = projectJpaRepository.findAllByComplete(true);
+
+		for (int i = 0; i < myAllProject.size(); i++) {
+			if (!memberJpaRepository.findByProjectAndUser(myAllProject.get(i), user).isPresent() ||
+				portfolioJpaRepository.findByProjectAndUser(myAllProject.get(i), user).isPresent()) {
 				myAllProject.remove(i--);
 			}
 		}
@@ -130,6 +162,7 @@ public class ProjectRestController {
 			applyFieldJpaRepository.save(applyField);
 			if (applyField.getField().equals(field)) {
 				member.setField(applyField);
+				member.setComplete(false);
 				memberJpaRepository.save(member);
 			}
 		}
@@ -152,6 +185,7 @@ public class ProjectRestController {
 			applyFieldJpaRepository.save(applyField);
 			if (applyField.getField().equals(field)) {
 				member.setField(applyField);
+				member.setComplete(false);
 				memberJpaRepository.save(member);
 			}
 		}
@@ -174,5 +208,33 @@ public class ProjectRestController {
 		}
 
 		return false;
+	}
+
+	@PostMapping("/complete/{no}")
+	public Boolean completeProject(HttpSession session, @PathVariable Integer no) {
+		User user = (User)session.getAttribute("user");
+		Project project = projectJpaRepository.findById(no).get();
+
+		if (user.equals(project.getOrganizer())) {
+			List<Member> members = memberJpaRepository.findAllByProject(project);
+			Member organizer = memberJpaRepository.findByProjectAndUser(project, user).get();
+			members.remove(organizer);
+			for (Member member : members) {
+				if (!member.isComplete()) {
+					return false;
+				}
+			}
+
+			organizer.setComplete(true);
+			memberJpaRepository.save(organizer);
+			project.setComplete(true);
+			projectJpaRepository.save(project);
+		}
+		else {
+			return false;
+		}
+
+
+		return true;
 	}
 }

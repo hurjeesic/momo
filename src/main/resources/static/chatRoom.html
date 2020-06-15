@@ -104,10 +104,7 @@
         </div>
         <div class="col-sm-2">
             <h1>참여인원</h1>
-            <ul class="list-group" id="chatUserList">
-                <li class="list-group-item">고재우<input class="pull-right" type="checkbox" disabled readonly></li>
-                <li class="list-group-item">허지식 <button class="pull-right" type="submit">완료</button></li>
-            </ul>
+            <ul class="list-group" id="chatUserList"></ul>
         </div>
     </div>
 </div>
@@ -116,7 +113,7 @@
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script src="js/bootstrap.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<script src="js/myLibrary.js"></script>
 
 <script src="/webjars/axios/0.17.1/dist/axios.min.js"></script>
 <script src="/webjars/sockjs-client/1.1.2/sockjs.min.js"></script>
@@ -132,8 +129,10 @@
 	const chatRoomList = $('#chatRoomList');
 	const messageTxt = $('#messageTxt');
 	const messageList = $('#messageList');
+	const chatUserList = $('#chatUserList');
 	const title = $('#title');
 	const sendBtn = $('#sendBtn');
+	let username, complete;
 
 	$.ajax({
 		type: 'get',
@@ -142,10 +141,84 @@
 		async: false,
 		success: (data) => {
 			// 받은 유저 정보를 출력
+			username = data.nickname;
 		},
 		error: () => {
 			alert('세션이 만료되었습니다.');
 			window.location = './signIn.html';
+		}
+	});
+
+	$.ajax({
+		type: 'get',
+		url: `./api/project/${ projectId }`,
+		dataType: 'json',
+		async: false,
+		success: (data) => {
+			complete = data.project.complete;
+        }
+    })
+
+	$.ajax({
+		type: 'get',
+		url: `./api/member/list/${ projectId }`,
+		dataType: 'json',
+		async: false,
+		success: (members) => {
+			chatUserList.empty();
+			members.forEach((member) => {
+				let item = `<li class="list-group-item">${ member.user.nickname }`;
+				const memberName = member.user.nickname;
+				if (!complete && username == memberName) {
+					if (memberName == member.project.organizer.nickname) {
+						item += `<button type="button" class="pull-right" id="completeBtn">완료</button>`;
+						chatUserList.append(item);
+						$('#completeBtn').on('click', (e) => {
+							e.preventDefault();
+							$.ajax({
+								type: 'post',
+								url: `./api/project/complete/${ projectId }`,
+								dataType: 'json',
+								async: false,
+								success: (data) => {
+									if (data) {
+										alert('프로젝트가 완료되었습니다. 마이페이지에서 후기를 남겨주세요.');
+										window.location = './mypage.html';
+									}
+									else {
+										alert('프로젝트 완료 권한이 없습니다.');
+									}
+								},
+								error: () => {
+									alert('서버에 오류가 발생하였습니다.');
+								}
+							});
+						});
+					}
+					else {
+						item += `<input type="checkbox" class="pull-right" id="completeBox" value="1" ${ member.complete ? 'checked' : '' }></li>`;
+						chatUserList.append(item);
+						$('#completeBox').on('click', (e) => {
+							const bComplete = $('#completeBox').is(':checked');
+							sendComplete(bComplete);
+						});
+					}
+				}
+				else {
+					if (complete || memberName != member.project.organizer.nickname) {
+						item += `<input class="pull-right" type="checkbox" disabled ${ member.complete ? 'checked' : '' }></li>`;
+					}
+                    else {
+                    	item += '</li>';
+                    }
+
+					chatUserList.append(item);
+				}
+			});
+		},
+		error: () => {
+			alert('채팅방을 볼 권한이 없습니다.');
+			history.back();
 		}
 	});
 
@@ -217,13 +290,31 @@
 		messageTxt.val('');
 	}
 
+	function sendComplete(bComplete) {
+		const recvObj = {
+			type: 'COMPLETE',
+			room: { id: roomId }
+		};
+
+		if (bComplete) {
+			recvObj['message'] = username;
+		}
+
+		ws.send('/pub/chat/message', {}, JSON.stringify(recvObj));
+	}
+
 	function recvMessage(recv) {
-		if (recv.type == 'JOIN') {
-			// messageList.append(`<tr><td>[알림] ${recv.message}<td></tr>`);
-			// 사용자가 접속했을 때 받을 수 있도록 작동
+		if (recv.type == 'COMPLETE') {
+			console.log(chatUserList);
 		}
 		else {
-			messageList.append(`<tr><td>${ recv.sender.nickname }</td><td>${ recv.message }<td></tr>`);
+			if (recv.type == 'JOIN') {
+				// messageList.append(`<tr><td>[알림] ${recv.message}<td></tr>`);
+				// 사용자가 접속했을 때 받을 수 있도록 작동
+			}
+			else {
+				messageList.append(`<tr><td>${ recv.sender.nickname }</td><td>${ recv.message }<td></tr>`);
+			}
 		}
 	}
 

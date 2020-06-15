@@ -20,12 +20,15 @@ public class MemberRestController {
 	@Autowired
 	MemberJpaRepository memberJpaRepository;
 
-	@GetMapping("/")
-	public Member getMemberListByProject(HttpSession session, @RequestParam Integer projectNo) {
+	@GetMapping("/list/{no}")
+	public List<Member> getMemberListByProject(HttpSession session, @PathVariable Integer no) {
 		User user = (User)session.getAttribute("user");
-		Project project = projectJpaRepository.findById(projectNo).get();
-		if (project.getOrganizer().equals(user)) {
-			return memberJpaRepository.findByProjectAndUser(project, user).get();
+		Project project = projectJpaRepository.findById(no).get();
+		List<Member> members = memberJpaRepository.findAllByProject(project);
+		for (Member member : members) {
+			if (member.getUser().equals(user)) {
+				return memberJpaRepository.findAllByProject(project);
+			}
 		}
 
 		return null;
