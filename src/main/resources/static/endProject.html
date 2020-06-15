@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width" , initial-scale="1">
+    <title>프로젝트 종료 및 리뷰</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <style type="text/css">
+        .jumbotron {
+            background-image: url('images/bonobono.jpg');
+            background-size: cover;
+            text-shadow: black 0.2em 0.2em 0.2em;
+            color: white;
+        }
+
+        .dropdown:hover > .dropdown-menu {
+            display: block;
+        }
+
+        .noresize {
+            resize: none; /* 사용자 임의 변경 불가 */
+        }
+        .main-area {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed"
+                    data-toggle="collapse" data-target="#bs-example-navber-collapse-1"
+                    aria-expanded="false">
+                <span class="sr-only"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="">모여모여게시판</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="">포트폴리오 <span class="sr-only"></span></a></li>
+                <li class="active"><a href="">게시판 <span class="sr-only"></span></a></li>
+            </ul>
+
+            <ul class="nav navbar-nav pull-right">
+                <li class="active"><a href="./mypage.html">마이페이지<span class="sr-only"></span></a></li>
+            </ul>
+
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <div class="container">
+        <div class="jumbotron">
+            <h1 class="text-center">모모게시판</h1>
+            <p class="text-center"> 프로젝트의 거대한 도우미</p>
+        </div>
+    </div>
+    <div class="container main-area">
+
+        <div >
+
+            <h3>작업물</h3>
+            <textarea name="content" class="form-control col-sm-5 noresize" rows="5"
+                      cols="30"></textarea>
+
+        </div>
+
+        <div>
+            <h3>사용한 기술 툴 등등</h3>
+            <textarea name="content" class="form-control col-sm-5 noresize" rows="5"
+                      cols="30"></textarea>
+        </div>
+
+        <div>
+            <h3>리뷰를 적어요</h3>
+            <textarea name="content" class="form-control col-sm-5 noresize" rows="5"
+                      cols="30"></textarea>
+        </div>
+
+        <div class="container">
+            <div class="text-center">
+                <button type="button" class="btn btn-primary btn-lg" id="">
+                    리뷰 작성 완료
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="js/bootstrap.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+
+</body>
+</html>
