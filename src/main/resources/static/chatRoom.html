@@ -134,151 +134,124 @@
 	const sendBtn = $('#sendBtn');
 	let username, complete;
 
-	$.ajax({
-		type: 'get',
-		url: './api/user/',
-		dataType: 'json',
-		async: false,
-		success: (data) => {
-			// 받은 유저 정보를 출력
-			username = data.nickname;
-		},
-		error: () => {
-			alert('세션이 만료되었습니다.');
-			window.location = './signIn.html';
-		}
-	});
+	async function init() {
+		let errorCode = 0;
 
-	$.ajax({
-		type: 'get',
-		url: `./api/project/${ projectId }`,
-		dataType: 'json',
-		async: false,
-		success: (data) => {
-			complete = data.project.complete;
-        }
-    })
+		chatUserList.empty();
+		chatRoomList.empty();
+		messageList.empty();
 
-	$.ajax({
-		type: 'get',
-		url: `./api/member/list/${ projectId }`,
-		dataType: 'json',
-		async: false,
-		success: (members) => {
-			chatUserList.empty();
+		try {
+			const user = await $.get(getAjaxObject('./api/user/'));
+			const projectObj = await $.get(getAjaxObject(`./api/project/${projectId}`));
+			errorCode++;
+			const members = await $.get(getAjaxObject(`./api/member/list/${projectId}`));
+			errorCode++;
+			const roomList = await $.get(getAjaxObject('/api/chat/room/list', { projectId: projectId }));
+			roomId = roomId == null ? roomList[0].id : roomId;
+			const room = await $.get(getAjaxObject(`/api/chat/room/${roomId}`));
+			const messages = await $.get(getAjaxObject(`/api/chat/message/list/${roomId}`));
+
+			// 사용자 정보
+			username = user.nickname;
+
+			// 프로젝트 정보
+			complete = projectObj.project.complete;
+
+			// 프로젝트 맴버 정보
 			members.forEach((member) => {
-				let item = `<li class="list-group-item">${ member.user.nickname }`;
+				let item = `<li class="list-group-item">${member.user.nickname}`;
 				const memberName = member.user.nickname;
 				if (!complete && username == memberName) {
 					if (memberName == member.project.organizer.nickname) {
 						item += `<button type="button" class="pull-right" id="completeBtn">완료</button>`;
 						chatUserList.append(item);
-						$('#completeBtn').on('click', (e) => {
-							e.preventDefault();
-							$.ajax({
-								type: 'post',
-								url: `./api/project/complete/${ projectId }`,
-								dataType: 'json',
-								async: false,
-								success: (data) => {
-									if (data) {
-										alert('프로젝트가 완료되었습니다. 마이페이지에서 후기를 남겨주세요.');
-										window.location = './mypage.html';
-									}
-									else {
-										alert('프로젝트 완료 권한이 없습니다.');
-									}
-								},
-								error: () => {
-									alert('서버에 오류가 발생하였습니다.');
-								}
-							});
-						});
+						$('#completeBtn').on('click', (e) => grantCompleteEvent(e));
 					}
 					else {
-						item += `<input type="checkbox" class="pull-right" id="completeBox" value="1" ${ member.complete ? 'checked' : '' }></li>`;
+						item += `<input type="checkbox" class="pull-right" id="completeBox" value="1" ${member.complete ? 'checked' : ''}></li>`;
 						chatUserList.append(item);
-						$('#completeBox').on('click', (e) => {
-							const bComplete = $('#completeBox').is(':checked');
-							sendComplete(bComplete);
-						});
+						$('#completeBox').on('click', (e) => sendComplete($('#completeBox').is(':checked')));
 					}
 				}
 				else {
 					if (complete || memberName != member.project.organizer.nickname) {
-						item += `<input class="pull-right" type="checkbox" disabled ${ member.complete ? 'checked' : '' }></li>`;
+						item += `<input class="pull-right" type="checkbox" disabled ${member.complete ? 'checked' : ''}></li>`;
 					}
-                    else {
-                    	item += '</li>';
-                    }
+					else {
+						item += '</li>';
+					}
 
 					chatUserList.append(item);
 				}
 			});
-		},
-		error: () => {
-			alert('채팅방을 볼 권한이 없습니다.');
-			history.back();
-		}
-	});
 
-	function findRoomList(projectId) {
-		$.ajax({
-			type: 'get',
-			url: '/api/chat/room/list',
-			dataType: 'json',
-			data: { projectId: projectId },
-			success: (response) => {
-				let count = 0;
-				if (roomId === null) {
-					roomId = response[0].id;
+			// 프로젝트 방 번호 목록
+			let count = 0;
+			roomList.map((room) => {
+				let className = 'list-group-item';
+				if (room.id == roomId) {
+					className += ' active'; // 추가할 class name
 				}
 
-				chatRoomList.empty();
-				response.map((room) => {
-					let className = 'list-group-item';
-					if (room.id == roomId) {
-						className += ' active'; // 추가할 class name
-					}
-					chatRoomList.append(`<li class="${ className }" id="room${ count }">${ room.name }</li>`);
-					$(`#room${ count }`).click(() => {
-						sessionStorage.setItem('chat.room.id', room.id);
-						location.reload();
-					});
-					count++;
+				chatRoomList.append(`<li class="${className}" id="room${count}">${room.name}</li>`);
+				$(`#room${count}`).click(() => {
+					sessionStorage.setItem('chat.room.id', room.id);
+					location.reload();
 				});
+				count++;
+			});
 
-				findRoom(roomId);
-				findChatting(roomId);
-			},
-			error: () => {
-				alert('존재하지 않는 프로젝트입니다.');
-				window.location = './index.html';
+			// 접속한 방 이름
+			title.text(room.name);
+
+			// 접속한 방의 메시지 목록
+			messages.map((message) => messageList.append(`<tr><td>${message.sender.nickname}</td><td>${message.message}</td></tr>`));
+		}
+		catch (e) {
+			switch (errorCode) {
+				case 0:
+					alert('세션이 만료되었습니다.');
+					window.location = './signIn.html';
+					break;
+				case 1:
+					alert('채팅방을 볼 권한이 없습니다.');
+					history.back();
+					break;
+				case 2:
+					alert('존재하지 않는 프로젝트입니다.');
+					window.location = './index.html';
+					break;
+			}
+		}
+
+		messageTxt.on('keydown', (e) => {
+			if (e.which == 13) {
+				e.preventDefault();
+
+				sendMessage(messageTxt);
 			}
 		});
+
+		sendBtn.on('click', (e) => sendMessage(messageTxt));
 	}
 
-	function findRoom(roomId) {
-		$.ajax({
-			type: 'get',
-			url: `/api/chat/room/${ roomId }`,
-			dataType: 'json',
-			success: (response) => title.text(response.name)
-		});
-	}
+	async function grantCompleteEvent(e) {
+		e.preventDefault();
 
-	function findChatting(roomId) {
-		$.ajax({
-			type: 'get',
-			url: `/api/chat/message/list/${ roomId }`,
-			dataType: 'json',
-			success: (response) => {
-				messageList.empty();
-				response.map((message) => {
-					messageList.append(`<tr><td>${ message.sender.nickname }</td><td>${ message.message }</td></tr>`);
-				});
+		try {
+			const result = await $.post(getAjaxObject(`./api/project/complete/${projectId}`));
+			if (result) {
+				alert('프로젝트가 완료되었습니다. 마이페이지에서 후기를 남겨주세요.');
+				window.location = './mypage.html';
 			}
-		});
+			else {
+				alert('프로젝트 완료 권한이 없습니다.');
+			}
+		}
+		catch (e) {
+			alert('서버에 오류가 발생하였습니다.');
+		}
 	}
 
 	function sendMessage(messageTxt) {
@@ -311,17 +284,18 @@
 			if (recv.type == 'JOIN') {
 				// messageList.append(`<tr><td>[알림] ${recv.message}<td></tr>`);
 				// 사용자가 접속했을 때 받을 수 있도록 작동
+				console.log('대화 준비 완료');
 			}
 			else {
-				messageList.append(`<tr><td>${ recv.sender.nickname }</td><td>${ recv.message }<td></tr>`);
+				messageList.append(`<tr><td>${recv.sender.nickname}</td><td>${recv.message}<td></tr>`);
 			}
 		}
 	}
 
 	function connect() {
 		// pub/sub event
-		ws.connect({}, function (frame) {
-			ws.subscribe(`/sub/chat/room/${ roomId }`, function (message) {
+		ws.connect({}, (frame) => {
+			ws.subscribe(`/sub/chat/room/${roomId}`, (message) => {
 				let recv = JSON.parse(message.body);
 				recvMessage(recv);
 			});
@@ -332,7 +306,7 @@
 			}));
 		}, function (error) {
 			if (reconnect++ <= 5) {
-				setTimeout(function () {
+				setTimeout(() => {
 					console.log('connection reconnect');
 					sock = new SockJS('/ws-stomp');
 					ws = Stomp.over(sock);
@@ -346,18 +320,7 @@
 		});
 	}
 
-	messageTxt.on('keydown', (e) => {
-		if (e.which == 13) {
-			e.preventDefault();
-			sendMessage(messageTxt);
-		}
-	});
-	sendBtn.on('click', (e) => {
-		e.preventDefault();
-		sendMessage(messageTxt);
-	});
-
-	findRoomList(projectId);
+	init();
 	connect();
 </script>
 </body>

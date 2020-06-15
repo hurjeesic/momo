@@ -129,100 +129,47 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
 <script src="js/myLibrary.js"></script>
 <script>
-	const projectList = $('#projectList');
-	const createBtn = $('#createBtn');
 	const params = getParameters();
 	const pageNo = params.page;
+	const projectList = $('#projectList');
+	const createBtn = $('#createBtn');
 
-	$.ajax({
-		type: 'get',
-		url: './api/user/',
-		dataType: 'json',
-		async: false,
-		success: (data) => {
-			// 받은 유저 정보를 출력
-		},
-		error: () => {
-			alert('세션이 만료되었습니다.');
-			window.location = './signIn.html';
-		}
-	});
+	async function init() {
+		projectList.empty();
 
-	$.ajax({
-		type: 'get',
-		url: `./api/project/list/${ pageNo == undefined ? 1 : pageNo }`,
-		dataType: 'json',
-		success: (data) => {
-			projectList.empty(); //Detail
-			data.map((obj) => {
-				let item = `<tr><td>${ obj.project.no }</td><td class="dropdown">` +
-					`<a href=./project.html?no=${ obj.project.no }&check=y>${ obj.project.title }</a>` +
+		try {
+			await $.get(getAjaxObject('./api/user/'));
+			const projectObjs = await $.get(getAjaxObject(`./api/project/list/${pageNo == undefined ? 1 : pageNo}`));
+
+			// 프로젝트 목록
+			projectObjs.map((projectObj) => {
+				const processList = ['모집중', '진행중', '완료'], presentNumbers = {}, allNumbers = {};
+				const [presentNumber , allNumber] = getMemberNumbers(projectObj, presentNumbers, allNumbers, 0);
+				let item = `<tr><td>${projectObj.project.no}</td><td class="dropdown">` +
+					`<a href="./project.html?no=${projectObj.project.no}">${projectObj.project.title}</a>` +
 					'<a class="dropdown-toggle pull-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>' +
-					`<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">${ obj.project.content }</div></td><td>`;
-
-				switch (obj.project.process) {
-					case 0:
-						item += '모집중';
-						break;
-					case 1:
-						item += '진행중';
-						break;
-					case 2:
-						item += '완료';
-						break;
-				}
-
-				item += `</td><td>${ obj.project.organizer.nickname }</td>`;
-
-				const presentNumbers = {};
-				const allNumbers = {};
-				let presentNumber = 0, allNumber = 0;
-				for (const member of obj.members) { // 현재 인원 현황
-					if (presentNumbers.hasOwnProperty(member.field.field)) {
-						presentNumbers[member.field.field]++;
-					}
-					else {
-						presentNumbers[member.field.field] = 1;
-					}
-
-					presentNumber++;
-				}
-
-				for (let applyField of obj.applyFields) { // 전체 인원 현황
-					allNumbers[applyField.field] = applyField.number;
-
-					allNumber += applyField.number;
-
-					if (!presentNumbers.hasOwnProperty(applyField.field)) {
-						presentNumbers[applyField.field] = 0;
-					}
-				}
-
-				item += `<td class="dropdown">${ presentNumber } / ${ allNumber }` +
+					`<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">${projectObj.project.content}</div></td>` +
+					`<td>${processList[projectObj.project.process]}</td><td>${projectObj.project.organizer.nickname}</td>` +
+					`<td class="dropdown">${presentNumber} / ${allNumber}` +
 					'<span class="pull-right">▽</span>' +
 					'<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">';
 
 				for (let field in allNumbers) {
-					item += `${ field } ${ presentNumbers[field] } / ${ allNumbers[field] }<br>`;
+					item += `${field} ${presentNumbers[field]} / ${allNumbers[field]}<br>`;
 				}
 
-				item = item.substr(0, item.length - 4);
-
-				item += '</div></td></tr>';
-
-				projectList.append(item);
+				projectList.append(item.substr(0, item.length - 4) + '</div></td></tr>');
 			});
-		},
-		error: () => {
+		}
+		catch (e) {
 			alert('세션이 만료되었습니다.');
 			window.location = './signIn.html';
 		}
-	});
 
-	createBtn.on('click', (e) => {
-		e.preventDefault();
-		window.location = './createProject.html';
-	});
+		createBtn.on('click', (e) => window.location = './createProject.html');
+	}
+
+	init();
 </script>
 </body>
 </html>

@@ -120,7 +120,6 @@
 </div>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="js/bootstrap.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
 <script src="js/myLibrary.js"></script>
 <script>
@@ -134,66 +133,64 @@
 	const startDate = $('#startDate');
 	const endDate = $('#endDate');
 	const params = getParameters();
+	const presentNumbers = {};
 
-	$.ajax({
-		type: 'get',
-		url: './api/user/',
-		dataType: 'json',
-		async: false,
-		success: (data) => {
-			// 받은 유저 정보를 출력
-		},
-		error: () => {
+	async function init() {
+		try {
+			await $.get(getAjaxObject('./api/user/'));
+			const projectObj = await $.get(getAjaxObject(`./api/project/${params.no}`));
+
+			// 프로젝트 정보
+			getMemberNumbers(projectObj, presentNumbers, {}, 1, callbackPresent, callbackAll);
+			$('form').append(`<input type="hidden" name="no" value="${projectObj.project.no}">`);
+			titleTxt.val(projectObj.project.title);
+			startDate.val(new Date(projectObj.project.start).format('yyyy-MM-dd'));
+			endDate.val(new Date(projectObj.project.end).format('yyyy-MM-dd'));
+			contentTxt.val(projectObj.project.content);
+			$(`input:radio[name="process"]:radio[value="${projectObj.project.process}"]`).prop('checked', true);
+			$(`input:radio[name="apply"]:radio[value="${projectObj.project.apply}"]`).prop('checked', true);
+		}
+		catch (e) {
 			alert('세션이 만료되었습니다.');
 			window.location = './signIn.html';
 		}
-	});
 
-	$.ajax({
-		type: 'get',
-		url: `./api/project/${ params.no }`,
-		dataType: 'json',
-		async: false,
-		success: (obj) => {
-			const presentNumbers = {};
+		updateBtn.on('click', (e) => {
+			e.preventDefault();
+			// 프로젝트 수정
 
-			$('form').append(`<input type="hidden" name="no" value="${ obj.project.no }">`);
-			titleTxt.val(obj.project.title);
-
-			obj.members.forEach((member) => { // 현재 인원 현황
-				const field = member.field.field;
-				presentNumbers[field] = presentNumbers.hasOwnProperty(field) ? presentNumbers[field] + 1 : 1;
-
-				if (member.user.nickname == obj.project.organizer.nickname) {
-                    myFieldTxt.val(field);
-                }
-			});
-
-			obj.applyFields.forEach((field) => {
-				if (!presentNumbers.hasOwnProperty(field)) {
-					presentNumbers[field] = 1;
+			if (checkFormValidation()) {
+				const [valid, fieldValid] = checkFieldsValidation();
+				if (valid) {
+					if (fieldValid) {
+						updateProject();
+					}
+					else {
+						alert('본인의 역할은 전체 역할 내에 있어야합니다.');
+						myFieldTxt.focus();
+					}
 				}
+			}
+		});
 
-				employees.append(`<div class="col-sm-6 input-group"><input type="hidden" value="${ field.no }">` +
-					`<input type="text" placeholder="직군" value="${ field.field }"><input type="number" min="${ presentNumbers[field] }" placeholder="인원 수" value="${ field.number }"></div>`);
-				fields.push(employees.children(':last'));
-			});
+		cancelBtn.on('click', (e) => window.location = './index.html');
+	}
 
-			startDate.val(new Date(obj.project.start).format('yyyy-MM-dd'));
-			endDate.val(new Date(obj.project.end).format('yyyy-MM-dd'));
-			contentTxt.val(obj.project.content);
-			$(`input:radio[name="process"]:radio[value="${ obj.project.process }"]`).prop('checked', true);
-			$(`input:radio[name="apply"]:radio[value="${ obj.project.apply }"]`).prop('checked', true);
-		},
-		error: () => {
-			alert('세션이 만료되었습니다.');
-			window.location = './signIn.html';
+	function callbackPresent(projectObj, member) {
+		if (member.user.nickname == projectObj.project.organizer.nickname) {
+			myFieldTxt.val(member.field.field);
 		}
-	});
+	}
 
-	updateBtn.on('click', (e) => {
-		e.preventDefault();
-		// 프로젝트 수정
+	function callbackAll(presentNumbers, allNumbers, applyField) {
+		const field = applyField.field;
+
+		employees.append(`<div class="col-sm-6 input-group"><input type="hidden" value=${applyField.no}>` +
+			`<input type="text" placeholder="직군" value="${field}"><input type="number" min=${presentNumbers[field]} placeholder="인원 수" value=${applyField.number}></div>`);
+		fields.push(employees.children(':last'));
+	}
+
+	function checkFormValidation() {
 		if (!titleTxt.val()) {
 			alert('프로젝트 제목을 입력해주세요.');
 		}
@@ -204,68 +201,62 @@
 			alert('본인의 역할을 입력해주세요.');
 		}
 		else {
-			let valid = true;
-			let fieldValid = false;
-			for (let i = 0; i < fields.length; i++) {
-				let no = fields[i].children('input[type=hidden]');
-				let field = fields[i].children('input[type=text]');
-				let number = fields[i].children('input[type=number]');
-				if (!field.val()) {
-					alert('모든 직군을 적어주세요.');
-					valid = false;
-				}
-				else if (!number.val()) {
-					alert('각 직군에 따른 인원 수를 적어주세요.');
-					valid = false;
-				}
-				else if (isNaN(Number(number.val()))) {
-					alert('인원 수에는 숫자만 가능합니다.');
-					valid = false;
-				}
-
-				if (myFieldTxt.val() == field.val()) {
-					fieldValid = true;
-				}
-
-				if (!valid) {
-					break;
-				}
-
-				no.attr('name', `ApplyFieldList[${ i }].no`, no);
-				field.attr('name', `ApplyFieldList[${ i }].field`, field);
-				number.attr('name', `ApplyFieldList[${ i }].number`, number);
-			}
-
-			if (valid) {
-				if (fieldValid) {
-					$.ajax({
-						type: 'put',
-						url: '/api/project/update',
-						dataType: 'json',
-						data: $('form').serializeArray(),
-						async: false,
-						success: (data) => {
-							alert('프로젝트가 수정되었습니다.');
-							window.location = './mypage.html';
-						},
-						error: () => {
-							alert('세션이 만료되었습니다.');
-							window.location = './signIn.html';
-						}
-					});
-				}
-				else {
-					alert('본인의 역할은 전체 역할 내에 있어야합니다.');
-					myFieldTxt.focus();
-				}
-			}
+			return true;
 		}
-	});
 
-	cancelBtn.on('click', (e) => {
-		e.preventDefault();
-		window.location = './index.html';
-	});
+		return false;
+	}
+
+	function checkFieldsValidation() {
+		let valid = true;
+		let fieldValid = false;
+		for (let i = 0; i < fields.length; i++) {
+			let no = fields[i].children('input[type=hidden]');
+			let field = fields[i].children('input[type=text]');
+			let number = fields[i].children('input[type=number]');
+			if (!field.val()) {
+				alert('모든 직군을 적어주세요.');
+				valid = false;
+			}
+			else if (!number.val()) {
+				alert('각 직군에 따른 인원 수를 적어주세요.');
+				valid = false;
+			}
+			else if (isNaN(Number(number.val()))) {
+				alert('인원 수에는 숫자만 가능합니다.');
+				valid = false;
+			}
+
+			if (myFieldTxt.val() == field.val()) {
+				fieldValid = true;
+			}
+
+			if (!valid) {
+				break;
+			}
+
+			no.attr('name', `ApplyFieldList[${i}].no`, no);
+			field.attr('name', `ApplyFieldList[${i}].field`, field);
+			number.attr('name', `ApplyFieldList[${i}].number`, number);
+		}
+
+		return [valid, fieldValid];
+	}
+
+	async function updateProject() {
+		try {
+			await $.put(getAjaxObject('/api/project/update', $('form').serializeArray()));
+
+			alert('프로젝트가 수정되었습니다.');
+			window.location = './mypage.html';
+		}
+		catch (e) {
+			alert('세션이 만료되었습니다.');
+			window.location = './signIn.html';
+		}
+	}
+
+	init();
 </script>
 </body>
 </html>

@@ -88,63 +88,63 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
 <script src="js/myLibrary.js"></script>
 <script>
-	let username;
 	const params = getParameters();
 	const file = $('#file');
 	const skillTxt = $('#skillTxt');
 	const contentTxt = $('#contentTxt');
 	const completeBtn = $('#completeBtn');
-	let bOrganizer = false;
+	let username, bOrganizer;
 
-	$.ajax({
-		type: 'get',
-		url: './api/user/',
-		dataType: 'json',
-		async: false,
-		success: (data) => {
-			// 받은 유저 정보를 출력
-			username = data.nickname;
-		},
-		error: () => {
-			alert('세션이 만료되었습니다.');
-			window.location = './signIn.html';
-		}
-	});
+	async function init() {
+		try {
+			const user = await $.get(getAjaxObject('./api/user/'));
+			const projectObj = await $.get(getAjaxObject(`./api/project/${params.no}`));
 
-	$.ajax({
-		type: 'get',
-		url: `./api/project/${ params.no }`,
-		dataType: 'json',
-		async: false,
-		success: (obj) => {
-			if (obj.project.organizer.nickname == username) {
-				bOrganizer = true;
-			}
-			else {
+			// 사용자 정보
+			username = user.nickname;
+
+			// 프로젝트 정보
+			bOrganizer = projectObj.project.organizer.nickname == username;
+			if (!bOrganizer) {
+				let bMember = false;
+				for (const member of projectObj.members) {
+					if (username == member.user.nickname) {
+						bMember = true;
+						break;
+					}
+				}
+
+				if (!bMember) { // 프로젝트 맴버가 아닌 경우
+					alert('권한이 존재하지 않습니다.');
+					history.back();
+				}
+
 				$('#fileGroup').remove();
 			}
-
-			let bMember = false;
-			for (const member of obj.members) {
-				if (username == member.user.nickname) {
-					bMember = true;
-					break;
-				}
-			}
-
-			if (!bMember) { // 프로젝트 맴버가 아닌 경우
-				alert('권한이 존재하지 않습니다.');
-				history.back();
-			}
-		},
-		error: () => {
+		}
+		catch (e) {
 			alert('세션이 만료되었습니다.');
 			window.location = './signIn.html';
 		}
-	});
 
-	completeBtn.on('click', (e) => {
-		e.preventDefault();
+		completeBtn.on('click', (e) => {
+			e.preventDefault();
+
+			if (checkFormValidation()) {
+				// ajax 파일 전송 -> https://lts0606.tistory.com/31
+				// FormData -> https://www.zerocho.com/category/HTML&DOM/post/59465380f2c7fb0018a1a263
+				const formData = new FormData();
+				formData.append('project.no', params.no);
+				formData.append('file', file[0].files[0]);
+				formData.append('skill', skillTxt.val());
+				formData.append('content', contentTxt.val());
+
+				completeProject(formData);
+			}
+		});
+	}
+
+	function checkFormValidation() {
 		if (bOrganizer && !file.val()) {
 			alert('완성된 프로젝트 결과물을 첨부해주세요.');
 		}
@@ -155,39 +155,31 @@
 			alert('리뷰 내용을 입력해주세요.');
 		}
 		else {
-			// ajax 파일 전송 -> https://lts0606.tistory.com/31
-			// FormData -> https://www.zerocho.com/category/HTML&DOM/post/59465380f2c7fb0018a1a263
-			const formData = new FormData();
-			formData.append('project.no', params.no);
-			formData.append('file', file[0].files[0]);
-			formData.append('skill', skillTxt.val());
-			formData.append('content', contentTxt.val());
-
-			$.ajax({
-				type: 'post',
-				url: `./api/portfolio/insert`,
-				data: formData,
-				dataType: 'json',
-				enctype: 'multipart/form-data',
-				contentType: false,
-				processData: false,
-				async: false,
-				success: (data) => {
-					if (data) {
-						alert('포트폴리오 작성이 완료되었습니다.');
-						window.location = './mypage.html';
-					}
-                    else {
-                        alert('파일 확장자는 zip만 가능합니다.');
-                    }
-				},
-				error: () => {
-					alert('세션이 만료되었습니다.');
-					window.location = './signIn.html';
-				}
-			});
+			return true;
 		}
-	});
+
+		return false;
+	}
+
+	async function completeProject(data) {
+		try {
+			const result = await $.post(getAjaxObject('./api/portfolio/insert', data, true));
+
+			if (result) {
+				alert('포트폴리오 작성이 완료되었습니다.');
+				window.location = './mypage.html';
+			}
+			else {
+				alert('파일 확장자는 zip만 가능합니다.');
+			}
+		}
+		catch (e) {
+			alert('세션이 만료되었습니다.');
+			window.location = './signIn.html';
+		}
+	}
+
+	init();
 </script>
 </body>
 </html>

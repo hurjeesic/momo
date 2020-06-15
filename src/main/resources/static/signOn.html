@@ -39,6 +39,7 @@
                 <span class="input-group-btn">
                     <button type="button" class="btn btn-primary" id="codeCheckBtn">확인</button>
                 </span>
+                <input type="hidden" id="code">
             </div><!-- /.col-sm-6 -->
         </div>
         <div class="container input-group input-group-lg">
@@ -55,7 +56,7 @@
                 <span class="input-group-btn">
                     <button type="button" class="btn btn-primary" id="nicknameCheckBtn">중복확인</button>
                 </span>
-                <input type="hidden" id="checkNickname">
+                <input type="hidden" id="nickname">
             </div><!-- /.col-sm-6 -->
         </div>
         <div class="container input-group input-group-lg">
@@ -76,6 +77,7 @@
 
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script src="js/bootstrap.js"></script>
+<script src="js/myLibrary.js"></script>
 <script>
 	const emailTxt = $('#emailTxt');
 	const emailBtn = $('#emailBtn');
@@ -83,64 +85,59 @@
 	const pwdCheckTxt = $('#pwdCheckTxt');
 	const codeTxt = $('#codeTxt');
 	const codeCheckBtn = $('#codeCheckBtn');
+	const code = $('#code');
 	const nicknameTxt = $('#nicknameTxt');
 	const nicknameCheckBtn = $('#nicknameCheckBtn');
-	const checkNickname = $('#checkNickname');
+	const nickname = $('#nickname');
 	const phoneTxt = $('#phoneTxt');
 	const signUpBtn = $('#signUpBtn');
 
-	codeTxt.attr('disabled', true);
-	codeCheckBtn.attr('disabled', true);
-	checkNickname.val(false);
+	async function init() {
+		codeTxt.attr('disabled', true);
+		codeCheckBtn.attr('disabled', true);
 
-	emailBtn.on('click', (e) => {
-		e.preventDefault();
+		emailBtn.on('click', (e) => {
+			e.preventDefault();
+
+			if (checkEmailValidation()) {
+				sendAuthenticationCode();
+			}
+		});
+
+		codeCheckBtn.on('click', (e) => {
+			e.preventDefault();
+
+			if (checkCodeValidation()) {
+				confirmCode();
+			}
+		});
+
+		nicknameCheckBtn.on('click', (e) => {
+			e.preventDefault();
+
+			if (checkNickname()) {
+				confirmNickname();
+			}
+		});
+
+		signUpBtn.on('click', (e) => {
+			e.preventDefault();
+
+			if (checkSignUpValidation()) {
+				signUp();
+			}
+		});
+	}
+
+	function checkEmailValidation() {
 		if (emailTxt.val() == '') {
 			alert('이메일을 입력해주세요.');
 			emailTxt.focus();
 		}
 		else {
 			const emailExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
-
 			if (emailExp.test(emailTxt.val())) {
-				$.ajax({
-					type: 'get',
-					url: './api/user/check/email',
-					dataType: 'json',
-					data: { email: emailTxt.val() },
-					async: false,
-					success: (data) => {
-						if (data) {
-							$.ajax({
-								type: 'get',
-								url: './api/user/confirm/email',
-								data: { email: emailTxt.val() },
-								async: false,
-								success: () => {
-									alert('인증코드가 전송되었습니다.');
-
-									emailTxt.attr('disabled', true);
-									emailBtn.attr('disabled', true);
-									codeTxt.attr('disabled', false);
-									codeCheckBtn.attr('disabled', false);
-
-									codeTxt.focus();
-								},
-								error: () => {
-									alert('인증코드를 전송하지 못하였습니다.');
-								}
-							});
-						}
-						else {
-							alert('이미 존재하는 이메일입니다.');
-							emailTxt.val('');
-							emailTxt.focus();
-						}
-					},
-					error: () => {
-						console.log('spring boot exception');
-					}
-				});
+				return true;
 			}
 			else {
 				alert('올바르지 않은 이메일 형식입니다.\n다시 입력하여 주시기 바랍니다.');
@@ -148,77 +145,40 @@
 				emailTxt.focus();
 			}
 		}
-	});
 
-	codeCheckBtn.on('click', (e) => {
-		e.preventDefault();
+		return false;
+	}
+
+	function checkCodeValidation() {
 		if (codeTxt.val() == '') {
 			alert('인증 코드를 입력해주세요.');
 			codeTxt.focus();
 		}
 		else {
-			$.ajax({
-				type: 'get',
-				url: './api/user/confirm/email/check',
-				data: { code: codeTxt.val() },
-				async: false,
-				success: (data) => {
-					if (data) {
-						alert('메일인증이 완료되었습니다.');
-						codeTxt.attr('disabled', true);
-						codeCheckBtn.attr('disabled', true);
-					}
-					else {
-						alert('인증코드가 올바르지 않습니다.');
-						codeTxt.val('');
-						codeTxt.focus();
-					}
-				},
-				error: () => {
-					alert('이메일 중복 체크를 해주세요.');
-					emailTxt.focus();
-				}
-			});
+			return true;
 		}
-	});
 
-	nicknameCheckBtn.on('click', (e) => {
-		e.preventDefault();
+		return false;
+	}
+
+	function checkNickname() {
 		if (nicknameTxt.val() == '') {
 			alert('닉네임을 입력해주세요.');
 			nicknameTxt.focus();
 		}
 		else {
-			$.ajax({
-				type: 'get',
-				url: './api/user/check/nickname',
-				data: { nickname: nicknameTxt.val() },
-				async: false,
-				success: (data) => {
-					if (data) {
-						alert('사용 가능한 닉네임입니다.');
-						nicknameTxt.attr('disabled', true);
-						nicknameCheckBtn.attr('disabled', true);
-						checkNickname.val(true);
-						phoneTxt.focus();
-					}
-					else {
-						alert('이미 존재하는 닉네임입니다.');
-						nicknameTxt.val('');
-						nicknameTxt.focus();
-					}
-				},
-				error: () => {
-					console.log('spring boot exception');
-				}
-			});
+			return true;
 		}
-	});
 
-	signUpBtn.on('click', (e) => {
-		e.preventDefault();
+		return false;
+	}
+
+	function checkSignUpValidation() {
 		if (emailTxt.val() == '') {
 			alert('이메일을 입력해주세요.');
+		}
+		else if (code.val() == '') {
+			alert('이메일 인증을 완료해주세요.');
 		}
 		else if (pwdTxt.val() == '') {
 			alert('비밀번호를 입력해주세요.');
@@ -226,32 +186,111 @@
 		else if (pwdTxt.val() != pwdCheckTxt.val()) {
 			alert('비밀번호와 비밀번호 확인이 다릅니다.');
 		}
-		else if (checkNickname.val() == 'false') {
+		else if (nickname.val() == '') {
 			alert('닉네임을 검증해주세요.');
 		}
 		else {
-			$.ajax({
-				type: 'post',
-				url: './api/user/insert',
-				data: {
-					email: emailTxt.val(), password: pwdTxt.val(),
-					nickname: nicknameTxt.val(), phone: phoneTxt.val()
-				},
-				success: (data) => {
-					if (data) {
-						alert('회원가입 성공하였습니다.');
-						window.location = './signIn.html';
-					}
-					else {
-						alert('이메일 검증을 완료해주세요.');
-					}
-				},
-				error: () => {
-					alert('회원가입 실패하였습니다.');
-				}
-			});
+			return true;
 		}
-	});
+
+		return false;
+	}
+
+	async function sendAuthenticationCode() {
+		let errorCode = 0;
+		try {
+			const result = await $.get(getAjaxObject('./api/user/check/email', { email: emailTxt.val() }));
+			errorCode++;
+			if (result) {
+				await $.get(getAjaxObject('./api/user/confirm/email', { email: emailTxt.val() }));
+
+				alert('인증코드가 전송되었습니다.');
+
+				emailTxt.attr('disabled', true);
+				emailBtn.attr('disabled', true);
+				codeTxt.attr('disabled', false);
+				codeCheckBtn.attr('disabled', false);
+
+				codeTxt.focus();
+			}
+			else {
+				alert('이미 존재하는 이메일입니다.');
+				emailTxt.val('');
+				emailTxt.focus();
+			}
+		}
+		catch (e) {
+			switch (errorCode) {
+				case 0:
+					console.log('spring boot exception');
+				case 1:
+					alert('인증코드를 전송하지 못하였습니다.');
+			}
+		}
+	}
+
+	async function confirmCode() {
+		try {
+			const result = await $.get(getAjaxObject('./api/user/confirm/email/check', { code: codeTxt.val() }));
+			if (result) {
+				alert('메일인증이 완료되었습니다.');
+				codeTxt.attr('disabled', true);
+				codeCheckBtn.attr('disabled', true);
+				code.val(codeTxt.val());
+			}
+			else {
+				alert('인증코드가 올바르지 않습니다.');
+				codeTxt.val('');
+				codeTxt.focus();
+			}
+		}
+		catch (e) {
+			alert('이메일 중복 체크를 해주세요.');
+			emailTxt.focus();
+		}
+	}
+
+	async function confirmNickname() {
+		try {
+			const result = await $.get(getAjaxObject('./api/user/check/nickname'));
+			if (result) {
+				alert('사용 가능한 닉네임입니다.');
+				nicknameTxt.attr('disabled', true);
+				nicknameCheckBtn.attr('disabled', true);
+				nickname.val(nicknameTxt.val());
+				phoneTxt.focus();
+			}
+			else {
+				alert('이미 존재하는 닉네임입니다.');
+				nicknameTxt.val('');
+				nicknameTxt.focus();
+			}
+		}
+		catch (e) {
+			console.log('spring boot exception');
+		}
+	}
+
+	async function signUp() {
+		try {
+			const result = await $.post(getAjaxObject('./api/user/insert', {
+				email: emailTxt.val(), password: pwdTxt.val(),
+				nickname: nicknameTxt.val(), phone: phoneTxt.val()
+			}));
+			if (result) {
+				alert('회원가입 성공하였습니다.');
+				window.location = './signIn.html';
+			}
+			else {
+				alert('이메일 검증을 완료해주세요.');
+			}
+		}
+		catch (e) {
+			alert('회원가입 실패하였습니다.');
+		}
+	}
+
+	init();
 </script>
 </body>
 </html>

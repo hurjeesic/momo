@@ -116,8 +116,8 @@
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="js/bootstrap.js"></script>
 <script src='https://kit.fontawesome.com/a076d05399.js'></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+<script src="js/myLibrary.js"></script>
 <script>
 	const employees = $('#employees');
 	const fields = [employees.children(':last')];
@@ -130,48 +130,61 @@
 	const startDateTxt = $('#startDate');
 	const endDateTxt = $('#endDate');
 
-	$.ajax({
-		type: 'get',
-		url: './api/user/',
-		dataType: 'json',
-		async: false,
-		success: (data) => {
-			// 받은 유저 정보를 출력
-		},
-		error: () => {
+	async function init() {
+		try {
+			await $.get(getAjaxObject('./api/user/'));
+		}
+		catch (e) {
 			alert('세션이 만료되었습니다.');
 			window.location = './signIn.html';
 		}
-	});
 
-	fieldAddBtn.on('click', (e) => {
-		e.preventDefault();
-		employees.append(`<div class="col-sm-6 input-group">` +
-			`<input type="text" placeholder="직군"><input type="number" min="1" placeholder="인원 수"></div>`);
-		fields.push(employees.children(':last'));
-		const addedObj = fields[fields.length - 1];
-		addedObj.children(':last').after(fieldAddBtn);
+		fieldAddBtn.on('click', (e) => {
+			e.preventDefault();
 
-		fieldAddBtn.after(`<button type="button" class="icon-btn"><div class="glyphicon glyphicon-minus-sign"/></button>`);
+			const addedObj = fields[fields.length - 1];
+			employees.append(`<div class="col-sm-6 input-group"><input type="text" placeholder="직군"><input type="number" min="1" placeholder="인원 수"></div>`);
+			fields.push(employees.children(':last'));
+			addedObj.children(':last').after(fieldAddBtn);
 
-		addedObj.children(':last').on('click', () => {
-			if (addedObj == fields[fields.length - 1]) {
-				if (fields.length > 2) {
-					fields[fields.length - 2].children(':last').before(fieldAddBtn);
+			fieldAddBtn.after(`<button type="button" class="icon-btn"><div class="glyphicon glyphicon-minus-sign"/></button>`);
+
+			addedObj.children(':last').on('click', () => {
+				if (addedObj == fields[fields.length - 1]) {
+					if (fields.length > 2) {
+						fields[fields.length - 2].children(':last').before(fieldAddBtn);
+					}
+					else {
+						fields[fields.length - 2].children(':last').after(fieldAddBtn);
+					}
 				}
-				else {
-					fields[fields.length - 2].children(':last').after(fieldAddBtn);
+
+				fields.splice(fields.indexOf(this), 1);
+				addedObj.remove();
+			});
+		});
+
+		createBtn.on('click', (e) => {
+			e.preventDefault();
+
+			if (checkFormValidation()) {
+				const [valid, fieldValid] = checkFieldsValidation();
+				if (valid) {
+					if (fieldValid) {
+						createProject();
+					}
+					else {
+						alert('본인의 역할은 전체 역할 내에 있어야합니다.');
+						myFieldTxt.focus();
+					}
 				}
 			}
-
-			fields.splice(fields.indexOf(this), 1);
-			addedObj.remove();
 		});
-	});
 
-	createBtn.on('click', (e) => {
-		e.preventDefault();
-		// 프로젝트 생성
+		cancelBtn.on('click', (e) => window.location = './index.html');
+	}
+
+	function checkFormValidation() {
 		if (!titleTxt.val()) {
 			alert('프로젝트 제목을 입력해주세요.');
 		}
@@ -188,66 +201,60 @@
 			alert('프로젝트 종료 날짜를 입력해주세요.');
 		}
 		else {
-			let valid = true;
-			let fieldValid = false;
-			for (let i = 0; i < fields.length; i++) {
-				const field = fields[i].children('input[type=text]');
-				const number = fields[i].children('input[type=number]');
-				if (!field.val()) {
-					alert('모든 직군을 적어주세요.');
-					valid = false;
-				}
-				else if (!number.val()) {
-					alert('각 직군에 따른 인원 수를 적어주세요.');
-					valid = false;
-				}
-				else if (isNaN(Number(number.val()))) {
-					alert('인원 수에는 숫자만 가능합니다.');
-					valid = false;
-				}
-
-				if (myFieldTxt.val() == field.val()) {
-					fieldValid = true;
-				}
-
-				if (!valid) {
-					break;
-				}
-
-				field.attr('name', `ApplyFieldList[${ i }].field`, field);
-				number.attr('name', `ApplyFieldList[${ i }].number`, number);
-			}
-
-			if (valid) {
-				if (fieldValid) {
-					$.ajax({
-						type: 'post',
-						url: '/api/project/insert',
-						dataType: 'json',
-						data: $('form').serializeArray(),
-						async: false,
-						success: (data) => {
-							alert('프로젝트가 생성되었습니다.');
-							window.location = './index.html';
-						},
-						error: () => {
-							alert('세션이 만료되었습니다.');
-							window.location = './signIn.html';
-						}
-					});
-				}
-				else {
-					alert('본인의 역할은 전체 역할 내에 있어야합니다.');
-					myFieldTxt.focus();
-				}
-			}
+			return true;
 		}
-	});
 
-	cancelBtn.on('click', (e) => {
-		e.preventDefault();
-		window.location = './index.html';
-	});
+		return false;
+	}
+
+	function checkFieldsValidation() {
+		let valid = true;
+		let fieldValid = false;
+		for (let i = 0; i < fields.length; i++) {
+			const field = fields[i].children('input[type=text]');
+			const number = fields[i].children('input[type=number]');
+			if (!field.val()) {
+				alert('모든 직군을 적어주세요.');
+				valid = false;
+			}
+			else if (!number.val()) {
+				alert('각 직군에 따른 인원 수를 적어주세요.');
+				valid = false;
+			}
+			else if (isNaN(Number(number.val()))) {
+				alert('인원 수에는 숫자만 가능합니다.');
+				valid = false;
+			}
+
+			if (myFieldTxt.val() == field.val()) {
+				fieldValid = true;
+			}
+
+			if (!valid) {
+				break;
+			}
+
+			field.attr('name', `ApplyFieldList[${i}].field`, field);
+			number.attr('name', `ApplyFieldList[${i}].number`, number);
+		}
+
+		return [valid, fieldValid];
+	}
+
+	async function createProject() {
+		try {
+			await $.post(getAjaxObject('/api/project/insert', $('form').serializeArray()));
+
+			alert('프로젝트가 생성되었습니다.');
+			window.location = './index.html';
+		}
+		catch (e) {
+			alert('세션이 만료되었습니다.');
+			window.location = './signIn.html';
+		}
+	}
+
+	init();
 </script>
 </body>
 </html>

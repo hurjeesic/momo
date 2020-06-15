@@ -1,3 +1,38 @@
+jQuery.each(['put', 'delete'], function (i, method) {
+	jQuery[method] = function (info) {
+		if (jQuery.isFunction(info.data)) {
+			info.type = info.type || info.success;
+			info.success = info.data;
+			info.data = {};
+		}
+
+		return jQuery.ajax({
+			url: info.url,
+			type: method,
+			dataType: info.dataType,
+			data: info.data,
+			success: info.success,
+			error: info.error
+		});
+	};
+});
+
+function getAjaxObject(url, data = {}, bFile = false) {
+	const result = {
+		url: url,
+		dataType: 'json',
+		data: data
+	};
+
+	if (bFile) {
+		result['enctype'] = 'multipart/form-data';
+		result['contentType'] = false;
+		result['processData'] = false;
+	}
+
+	return result;
+}
+
 function getParameters() {
 	const url = document.location.href;
 	const qs = url.substring(url.indexOf('?') + 1).split('&');
@@ -71,3 +106,29 @@ String.prototype.zf = function (len) {
 Number.prototype.zf = function (len) {
 	return this.toString().zf(len);
 };
+
+function getMemberNumbers(projectObj, presentNumbers, allNumbers, start, callbackPresent = null, callbackAll = null) {
+	let presentNumber = 0, allNumber = 0;
+	for (const member of projectObj.members) { // 현재 인원 현황
+		const field = member.field.field;
+		presentNumbers[field] = presentNumbers.hasOwnProperty(field) ? presentNumbers[field] + 1 : 1;
+		presentNumber++;
+
+		if (typeof callbackPresent === 'function') {
+			callbackPresent(projectObj, member);
+		}
+	}
+
+	for (const applyField of projectObj.applyFields) { // 전체 인원 현황
+		const field = applyField.field;
+		allNumbers[field] = applyField.number;
+		allNumber += applyField.number;
+		presentNumbers[field] = presentNumbers.hasOwnProperty(field) ? presentNumbers[field] : start;
+
+		if (typeof callbackAll === 'function') {
+			callbackAll(presentNumbers, allNumbers, applyField);
+		}
+	}
+
+	return [presentNumber, allNumber];
+}

@@ -109,49 +109,25 @@
 	const presentNumbers = {};
 	const allNumbers = {};
 
-	$.ajax({
-		type: 'get',
-		url: './api/user/',
-		dataType: 'json',
-		async: false,
-		success: (data) => {
-			// 받은 유저 정보를 출력
-			username = data.nickname;
-		},
-		error: () => {
-			alert('세션이 만료되었습니다.');
-			window.location = './signIn.html';
-		}
-	});
+	async function init() {
+		try {
+			const user = await $.get(getAjaxObject('./api/user/'));
+			const projectObj = await $.get(getAjaxObject(`./api/project/${params.no}`));
+			const applicants = await $.get(getAjaxObject(`./api/applicant/${params.no}`));
 
-	// 현재 팀원
-	$.ajax({
-		type: 'get',
-		url: `./api/project/${ params.no }`,
-		dataType: 'json',
-		async: false,
-		success: (obj) => {
-			if (obj.project.organizer.nickname == username) {
-				$('#title').val(obj.project.title);
+			// 사용자 정보
+			username = user.nickname;
 
-				for (const member of obj.members) { // 현재 인원 현황
-					const field = member.field.field;
-					presentNumbers[field] = presentNumbers.hasOwnProperty(field) ? presentNumbers[field] + 1 : 1;
-				}
+			// 프로젝트 정보
+			if (projectObj.project.organizer.nickname == username) {
+				$('#title').val(projectObj.project.title);
 
-				for (const applyField of obj.applyFields) { // 전체 인원 현황
-					const field = applyField.field;
-
-					allNumbers[field] = applyField.number;
-					if (!presentNumbers.hasOwnProperty(field)) {
-						presentNumbers[field] = 0;
-					}
-				}
+				getMemberNumbers(projectObj, presentNumbers, allNumbers, 0);
 
 				let item = '';
 				for (const field in allNumbers) {
-					item += '<li class="list-group-item d-flex justify-content-between align-items-center">';
-					item += `${ field }<span class="badge badge-primary">${ presentNumbers[field] } / ${ allNumbers[field] }</span></li>`;
+					item += '<li class="list-group-item d-flex justify-content-between align-items-center">' +
+						`${field}<span class="badge badge-primary">${presentNumbers[field]} / ${allNumbers[field]}</span></li>`;
 				}
 
 				$('#number').append(item);
@@ -160,43 +136,40 @@
 				alert('권한이 존재하지 않습니다.');
 				history.back();
 			}
-		},
-		error: () => {
-			alert('세션이 만료되었습니다.');
-			window.location = './signIn.html';
-		}
-	});
 
-	// 지원자
-	$.ajax({
-		type: 'get',
-		url: `./api/applicant/${ params.no }`,
-		dataType: 'json',
-		async: false,
-		success: (data) => {
-			let index = 1;
-			data.forEach((applicant) => {
-				let item = `<tr><td>${ index++ }</td>`;
-				item += `<td class="dropdown">${ applicant.user.nickname }<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">${ applicant.content }</div></td>`;
-				item += `<td>${ applicant.field.field }</td>`;
-				item += `<td><input type="checkbox" value="${ applicant.no }"></td></tr>`;
+			// 지원자 정보
+			for (let i = 0; i < applicants.length; i++) {
+				const applicant = applicants[i];
+				const item = `<tr><td>${i + 1}</td>` +
+					`<td class="dropdown">${applicant.user.nickname}<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">${applicant.content}</div></td>` +
+					`<td>${applicant.field.field}</td>` +
+					`<td><input type="checkbox" value="${applicant.no}"></td></tr>`;
 				$('#applicants').append(item);
-			});
-		},
-		error: () => {
+			}
+		}
+		catch (e) {
 			alert('세션이 만료되었습니다.');
 			window.location = './signIn.html';
 		}
-	});
 
-	confirmBtn.on('click', (e) => {
-		e.preventDefault();
-		const tempNumbers = {}, confirmList = [];
+		confirmBtn.on('click', (e) => {
+			e.preventDefault();
+
+			const confirmList = [];
+			if (checkApplicantsValidation(confirmList)) {
+				acceptUser(confirmList);
+            }
+		});
+	}
+
+	function checkApplicantsValidation(confirmList) {
+		const tempNumbers = {};
 		let failFields = '';
 		for (const key in presentNumbers) {
 			tempNumbers[key] = presentNumbers[key];
 		}
 
+		confirmList.length = 0;
 		$('#applicants>tr>td>input[type=checkbox]:checked').each((index, item) => {
 			tempNumbers[$(item).parent().prev().text()]++;
 			confirmList.push(parseInt($(item).val()));
@@ -205,38 +178,42 @@
 
 		for (const key in tempNumbers) {
 			if (tempNumbers[key] > allNumbers[key]) {
-				failFields += `${ failFields == '' ? '' : ',' } ${ key }`;
+				failFields += `${failFields == '' ? '' : ','} ${key}`;
 			}
 		}
 
 		if (failFields == '') {
-			$.ajax({
-				type: 'post',
-				url: `./api/applicant/complete`,
-				dataType: 'json',
-				data: { 'applicantNums': confirmList },
-				async: false,
-				success: (datas) => {
-					if (datas) {
-						// project, user, field
-						const users = [];
-						datas.forEach((data) => {
-							users.push(`${ data.user.nickname }님`);
-						});
-
-						alert(`${ users.join(', ') }이 승인되었습니다.`);
-						window.location = './mypage.html';
-					}
-					else {
-						alert('지원자 승인 권한이 없습니다.');
-					}
-				}
-			});
+			return true;
 		}
 		else {
-			alert(`${ key } 인원이 초과되었습니다.`);
+			alert(`${key} 인원이 초과되었습니다.`);
 		}
-	});
+
+		return false;
+    }
+
+	async function acceptUser(confirmList) {
+		try {
+			const members = await $.post(getAjaxObject(`./api/applicant/complete`, { 'applicantNums': confirmList }));
+			if (members) {
+				const verifiedUsers = [];
+				members.forEach((member) => {
+					verifiedUsers.push(`${member.user.nickname}님`);
+				});
+
+				alert(`${verifiedUsers.join(', ')}이 승인되었습니다.`);
+				window.location = './mypage.html';
+			}
+			else {
+				alert('지원자 승인 권한이 없습니다.');
+			}
+		}
+		catch (e) {
+
+		}
+    }
+
+	init();
 </script>
 </body>
 </html>
