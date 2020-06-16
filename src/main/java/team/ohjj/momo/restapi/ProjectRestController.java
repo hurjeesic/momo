@@ -181,6 +181,7 @@ public class ProjectRestController {
 
 		Member member = memberJpaRepository.findByProjectAndUser(project, user).get();
 		for (ApplyField applyField : applyFields.getApplyFieldList()) {
+			applyField.setProject(project);
 			applyFieldJpaRepository.save(applyField);
 			if (applyField.getField().equals(field)) {
 				member.setField(applyField);

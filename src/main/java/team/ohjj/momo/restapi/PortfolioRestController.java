@@ -2,6 +2,7 @@ package team.ohjj.momo.restapi;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import team.ohjj.momo.domain.Portfolio;
@@ -32,7 +33,7 @@ public class PortfolioRestController {
 	}
 
 	@PostMapping("/insert")
-	public Boolean createPortfolio(HttpServletRequest request, HttpSession session, @RequestParam MultipartFile file, @ModelAttribute Portfolio portfolio) {
+	public Boolean createPortfolio(HttpServletRequest request, HttpSession session, @Nullable @RequestParam MultipartFile file, @ModelAttribute Portfolio portfolio) {
 		User user = (User)session.getAttribute("user");
 		String path;
 		File projectFile;
