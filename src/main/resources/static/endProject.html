@@ -148,6 +148,9 @@
 		if (bOrganizer && !file.val()) {
 			alert('완성된 프로젝트 결과물을 첨부해주세요.');
 		}
+		else if (bOrganizer && getExtension(file.val()) != 'zip') {
+			alert('프로젝트 결과물은 zip파일만 첨부 가능합니다.');
+		}
 		else if (skillTxt.val() == '') {
 			alert('사용된 기술을 입력해주세요.');
 		}

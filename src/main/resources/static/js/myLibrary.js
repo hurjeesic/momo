@@ -1,3 +1,7 @@
+function getExtension(filePath) {
+	return filePath.substring(filePath.lastIndexOf('.') + 1, filePath.length).toLowerCase();
+}
+
 jQuery.each(['put', 'delete'], function (i, method) {
 	jQuery[method] = function (info) {
 		if (jQuery.isFunction(info.data)) {
