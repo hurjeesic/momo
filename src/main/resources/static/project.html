@@ -238,7 +238,7 @@
 		}
 
 		if (params.check) {
-			if (openModalBtn.text() != '수정') {
+			if (openModalBtn.text() != '수정' || params.complete) {
 				openModalBtn.text('확인');
 				openModalBtn.on('click', (e) => window.location = './index.html');
 			}
