@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width" , initial-scale="1">
     <title>프로젝트</title>
     <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/myStyle.css">
     <style type="text/css">
         .jumbotron {
             background-image: url('images/bonobono.jpg');
@@ -45,20 +46,17 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="./index.html">모여모여게시판</a>
+            <a class="navbar-brand">모여모여게시판</a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="">포트폴리오 <span class="sr-only"></span></a></li>
-                <li class="active"><a href="">게시판 <span class="sr-only"></span></a></li>
+                <li class="active" id="portfolioBtn"><a>포트폴리오<span class="sr-only"></span></a></li>
+                <li class="active" id="boardBtn"><a>게시판<span class="sr-only"></span></a></li>
             </ul>
-
             <ul class="nav navbar-nav pull-right">
-                <li class="active"><a href="">로그아웃<span class="sr-only"></span></a></li>
-
-                <li class="active"><a href="./mypage.html">마이페이지<span class="sr-only"></span></a></li>
+                <li class="active" id="logoutBtn"><a>로그아웃<span class="sr-only"></span></a></li>
+                <li class="active" id="myPageBtn"><a>마이페이지<span class="sr-only"></span></a></li>
             </ul>
-
         </div>
     </div>
 </nav>
@@ -177,6 +175,7 @@
 
 
 </div>
+
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="js/bootstrap.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>

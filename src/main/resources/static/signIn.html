@@ -28,12 +28,6 @@
             </button>
             <a class="navbar-brand" href="">모여모여게시판</a>
         </div>
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="">포트폴리오 <span class="sr-only"></span></a></li>
-                <li class="active"><a href="">게시판 <span class="sr-only"></span></a></li>
-            </ul>
-        </div>
     </div>
 </nav>
 <div class="container">
@@ -100,7 +94,7 @@
 
 		$('#loginBtn').on('click', (e) => login());
 		$('#signUpBtn').on('click', (e) => window.location = './signOn.html');
-    }
+	}
 
 	function checkLoginValidation() {
 		if (emailTxt.val() == '') {

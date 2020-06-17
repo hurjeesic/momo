@@ -1,3 +1,21 @@
+async function logout() {
+	try {
+		if (await $.post(getAjaxObject('./api/user/logout'))) {
+			alert('로그아웃 되었습니다.');
+
+			window.location = './signIn.html';
+		}
+	}
+	catch (e) {
+		console.log(e);
+	}
+}
+
+$('#portfolioBtn').on('click', (e) => window.location = './portfolio.html');
+$('#boardBtn').on('click', (e) => window.location = './index.html');
+$('#logoutBtn').on('click', (e) => logout());
+$('#myPageBtn').on('click', (e) => window.location = './mypage.html');
+
 function getExtension(filePath) {
 	return filePath.substring(filePath.lastIndexOf('.') + 1, filePath.length).toLowerCase();
 }

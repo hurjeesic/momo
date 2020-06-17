@@ -23,6 +23,17 @@ public class UserRestController {
 
 	private final int minute = 60;
 
+	@PostMapping("/logout")
+	public Boolean logout(HttpSession session) {
+		if (!session.isNew()) {
+			session.invalidate();
+
+			return true;
+		}
+
+		return false;
+	}
+
 	@PostMapping("/login")
 	public Integer login(HttpSession session, @ModelAttribute User user) {
 		user = userJpaRepository.findByEmailAndPasswordAndType(user.getEmail(), user.getPassword(), user.getType()).get();
