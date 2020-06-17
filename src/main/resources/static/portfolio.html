@@ -64,7 +64,7 @@
         <h3>완료한 프로젝트</h3>
         <form>
             <div class="row">
-                <div class="col-md-10">
+                <div class="col-md-12">
                     <div class="">
                         <div class="table">
                             <table class="table table-hover results">
@@ -111,10 +111,10 @@
         </form>
     </div>
     &nbsp;
-    <div class="container main-area">
+    <div class="container ">
         <form>
             <div class="row">
-                <div class="col-md-5">
+                <div class="main-area col-md-6">
                     <h3>자격증</h3>
                     <button class="pull-right">삭제</button>
                     <div class="">
@@ -122,18 +122,18 @@
                             <table class="table table-hover results">
                                 <thead>
                                 <tr>
-                                    <th class="col-md-1">no.</th>
-                                    <th class="col-md-4">이름</th>
-                                    <th class="col-md-2">분야</th>
-                                    <th class="col-md-2">취득일시</th>
-                                    <th>선택</th>
+                                    <th class="col-sm-1">no.</th>
+                                    <th class="col-sm-4">이름</th>
+                                    <th class="col-sm-2">분야</th>
+                                    <th class="col-sm-2">취득일시</th>
+                                    <th class="col-sm-offset-1 col-sm-1">선택</th>
 
                                 </tr>
                                 </thead>
                                 <tbody id="b">
                                 <tr>
                                     <td>1</td>
-                                    <td class="dropdown"><a href="">전문 잠자기 자격증</a></td>
+                                    <td class="dropdown">전문 잠자기 자격증</td>
                                     <td>수면</td>
                                     <td class="dropdown"> 1996/04/27</td>
                                     <td><input class="" type="checkbox"></td>
@@ -143,8 +143,21 @@
                             </table>
                         </div>
                     </div>
+                    <div class=" col-lg-4">
+                        <input class="form-control input-sm" type="text" placeholder="제목">
+                    </div>
+                    <div class=" col-lg-2">
+                        <input class="form-control input-sm" type="text" placeholder="분야">
+                    </div>
+                    <div class=" col-lg-4">
+                        <input class="form-control input-sm" type="date">
+                    </div>
+
+                    <div class=" col-sm-2">
+                        <button type="button" class="btn btn-primary btn-sm " id="n">추가</button>
+                    </div>
                 </div>
-                <div class="col-sm-offset-1 col-md-5">
+                <div class=" main-area col-sm-offset-1 col-md-5">
                     <h3>수상경력</h3>
                     <button class="pull-right">삭제</button>
 
@@ -153,17 +166,17 @@
                             <table class="table table-hover results">
                                 <thead>
                                 <tr>
-                                    <th class="col-md-1">no.</th>
-                                    <th class="col-md-4">제목</th>
-                                    <th class="col-md-2">분야</th>
-                                    <th class="col-md-2">수상일시</th>
-                                    <th>선택</th>
+                                    <th class="col-sm-1">no.</th>
+                                    <th class="col-sm-4">제목</th>
+                                    <th class="col-sm-2">분야</th>
+                                    <th class="col-sm-2">수상일시</th>
+                                    <th class="col-sm-offset-1 col-sm-1">선택</th>
                                 </tr>
                                 </thead>
                                 <tbody id="c">
                                 <tr>
                                     <td>1</td>
-                                    <td class="dropdown"><a href="">잠자기 대회</a></td>
+                                    <td class="dropdown">잠자기 대회</td>
                                     <td>수면</td>
                                     <td class="dropdown">2020/04/27</td>
                                     <td><input class="" type="checkbox"></td>
@@ -171,6 +184,19 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                    <div class=" col-lg-4">
+                        <input class="form-control input-sm" type="text" placeholder="제목">
+                    </div>
+                    <div class=" col-lg-2">
+                        <input class="form-control input-sm" type="text" placeholder="분야">
+                    </div>
+                    <div class=" col-lg-4">
+                        <input class="form-control input-sm" type="date">
+                    </div>
+
+                    <div class=" col-sm-2">
+                        <button type="button" class="btn btn-primary btn-sm " id="n">추가</button>
                     </div>
                 </div>
             </div>
