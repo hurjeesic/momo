@@ -220,7 +220,10 @@ public class ProjectRestController {
 
 			organizer.setComplete(true);
 			memberJpaRepository.save(organizer);
+			Calendar presentTime = Calendar.getInstance();
+			project.setEnd(presentTime);
 			project.setComplete(true);
+			project.setCompletedTime(presentTime);
 			projectJpaRepository.save(project);
 		}
 		else {

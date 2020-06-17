@@ -53,5 +53,13 @@ public class Project implements Serializable {
 
     @Column
     @JsonProperty
+    private String tag;
+
+    @Column
+    @JsonProperty
     private boolean complete;
+
+    @Column(name = "completed_time")
+    @JsonProperty
+    private Calendar completedTime;
 }
