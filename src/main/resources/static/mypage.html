@@ -142,7 +142,7 @@
 			const user = await $.get(getAjaxObject('./api/user/'));
 			const applyProjectList = await $.get(getAjaxObject('./api/project/list/apply'));
 			const presentProjectList = await $.get(getAjaxObject('./api/project/list/present'));
-			const completedProjectList = await $.get(getAjaxObject('./api/project/list/complete/portfolio'));
+			const completedProjectList = await $.get(getAjaxObject('./api/project/list/complete/review'));
 
 			// 사용자 정보
 			nicknameLbl.text(user.nickname);

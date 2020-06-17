@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface ApplicantJpaRepository extends JpaRepository<Applicant, Integer> {
 	Optional<Applicant> findByProjectAndUser(Project project, User user);
 	List<Applicant> findAllByProject(Project project);
+	void deleteAllByProject(Project project);
 }
