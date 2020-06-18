@@ -59,140 +59,138 @@
     </div>
     <div class="container main-area">
         <h3>완료한 프로젝트</h3>
-        <form>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="">
-                        <div class="table">
-                            <table class="table table-hover results">
-                                <thead>
-                                <tr>
-                                    <th class="col-md-1">번호</th>
-                                    <th class="col-md-4">제목</th>
-                                    <th class="col-sm-2">종료일시</th>
-                                    <th class="col-md-2">주최자</th>
-                                    <th class="col-md-2">인원</th>
-                                </tr>
-                                </thead>
-                                <tbody id="completedProjects">
-                                <tr>
-                                    <td>1</td>
-                                    <td class="dropdown"><a href="">게임만들기</a>
-                                        <a class="dropdown-toggle pull-right"
-                                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        </a>
-                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                            게임만들기에 대한 간단한 설명입니다 이건 게임을 만드는 프로젝트에요
-                                        </div>
-                                    </td>
-                                    <td>2020/04/27</td>
-                                    <td>고재우</td>
-                                    <td class="dropdown">4/5
-                                        <a class="dropdown-toggle pull-right"
-                                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            ▽
-                                        </a>
-                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                            개발자 3 / 4
-                                            <br>
-                                            기획자 1 / 1
-                                        </div>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="">
+                    <div class="table">
+                        <table class="table table-hover results">
+                            <thead>
+                            <tr>
+                                <th class="col-md-1">번호</th>
+                                <th class="col-md-4">제목</th>
+                                <th class="col-sm-2">종료일시</th>
+                                <th class="col-md-2">주최자</th>
+                                <th class="col-md-2">인원</th>
+                            </tr>
+                            </thead>
+                            <tbody id="completedProjectList">
+                            <tr>
+                                <td>1</td>
+                                <td class="dropdown"><a href="">게임만들기</a>
+                                    <a class="dropdown-toggle pull-right"
+                                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    </a>
+                                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                        게임만들기에 대한 간단한 설명입니다 이건 게임을 만드는 프로젝트에요
+                                    </div>
+                                </td>
+                                <td>2020/04/27</td>
+                                <td>고재우</td>
+                                <td class="dropdown">4/5
+                                    <a class="dropdown-toggle pull-right"
+                                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        ▽
+                                    </a>
+                                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                        개발자 3 / 4
+                                        <br>
+                                        기획자 1 / 1
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
     &nbsp;
-    <div class="container ">
-        <form>
-            <div class="row">
-                <div class="main-area col-md-6">
-                    <h3>자격증</h3>
-                    <button class="pull-right">삭제</button>
-                    <div class="">
-                        <div class="table">
-                            <table class="table table-hover results">
-                                <thead>
-                                <tr>
-                                    <th class="col-sm-1">no.</th>
-                                    <th class="col-sm-4">이름</th>
-                                    <th class="col-sm-2">분야</th>
-                                    <th class="col-sm-2">취득일시</th>
-                                    <th class="col-sm-offset-1 col-sm-1">선택</th>
-                                </tr>
-                                </thead>
-                                <tbody id="certificate">
-                                <tr>
-                                    <td>1</td>
-                                    <td class="dropdown">전문 잠자기 자격증</td>
-                                    <td>수면</td>
-                                    <td class="dropdown"> 1996/04/27</td>
-                                    <td><input class="" type="checkbox"></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class=" col-lg-4">
-                        <input class="form-control input-sm" type="text" placeholder="제목">
-                    </div>
-                    <div class=" col-lg-2">
-                        <input class="form-control input-sm" type="text" placeholder="분야">
-                    </div>
-                    <div class=" col-lg-4">
-                        <input class="form-control input-sm" type="date">
-                    </div>
-                    <div class=" col-sm-2">
-                        <button type="button" class="btn btn-primary btn-sm " id="">추가</button>
+    <div class="container">
+        <div class="row">
+            <div class="main-area col-md-6">
+                <h3>자격증</h3>
+                <button class="pull-right">삭제</button>
+                <div class="">
+                    <div class="table">
+                        <table class="table table-hover results">
+                            <thead>
+                            <tr>
+                                <th class="col-sm-1">no.</th>
+                                <th class="col-sm-4">이름</th>
+                                <th class="col-sm-2">분야</th>
+                                <th class="col-sm-2">취득일시</th>
+                                <th class="col-sm-offset-1 col-sm-1">선택</th>
+                            </tr>
+                            </thead>
+                            <tbody id="certificateList">
+                            <tr>
+                                <td>1</td>
+                                <td class="dropdown">전문 잠자기 자격증</td>
+                                <td>수면</td>
+                                <td class="dropdown"> 1996/04/27</td>
+                                <td><input class="" type="checkbox"></td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div class=" main-area col-sm-offset-1 col-md-5">
-                    <h3>수상경력</h3>
-                    <button class="pull-right">삭제</button>
-                    <div class="">
-                        <div class="table">
-                            <table class="table table-hover results">
-                                <thead>
-                                <tr>
-                                    <th class="col-sm-1">no.</th>
-                                    <th class="col-sm-4">제목</th>
-                                    <th class="col-sm-2">분야</th>
-                                    <th class="col-sm-2">수상일시</th>
-                                    <th class="col-sm-offset-1 col-sm-1">선택</th>
-                                </tr>
-                                </thead>
-                                <tbody id="awards">
-                                <tr>
-                                    <td>1</td>
-                                    <td class="dropdown">잠자기 대회</td>
-                                    <td>수면</td>
-                                    <td class="dropdown">2020/04/27</td>
-                                    <td><input class="" type="checkbox"></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                <form id="certificateForm">
                     <div class=" col-lg-4">
-                        <input class="form-control input-sm" type="text" placeholder="제목">
+                        <input type="text" name="name" class="form-control input-sm" id="certificateName" placeholder="제목">
                     </div>
                     <div class=" col-lg-2">
-                        <input class="form-control input-sm" type="text" placeholder="분야">
+                        <input type="text" name="field" class="form-control input-sm" id="certificateField" placeholder="분야">
                     </div>
                     <div class=" col-lg-4">
-                        <input class="form-control input-sm" type="date">
+                        <input type="date" name="acquisitionDate" class="form-control input-sm" id="certificateDate">
                     </div>
                     <div class=" col-sm-2">
-                        <button type="button" class="btn btn-primary btn-sm " id="n">추가</button>
+                        <button type="button" class="btn btn-primary btn-sm" id="certificateAddBtn">추가</button>
                     </div>
+                </form>
+            </div>
+            <div class=" main-area col-sm-offset-1 col-md-5">
+                <h3>수상경력</h3>
+                <button class="pull-right">삭제</button>
+                <div class="">
+                    <div class="table">
+                        <table class="table table-hover results">
+                            <thead>
+                            <tr>
+                                <th class="col-sm-1">no.</th>
+                                <th class="col-sm-4">제목</th>
+                                <th class="col-sm-2">분야</th>
+                                <th class="col-sm-2">수상일시</th>
+                                <th class="col-sm-offset-1 col-sm-1">선택</th>
+                            </tr>
+                            </thead>
+                            <tbody id="awardList">
+                            <tr>
+                                <td>1</td>
+                                <td class="dropdown">잠자기 대회</td>
+                                <td>수면</td>
+                                <td class="dropdown">2020/04/27</td>
+                                <td><input class="" type="checkbox"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class=" col-lg-4">
+                    <input class="form-control input-sm" type="text" placeholder="제목">
+                </div>
+                <div class=" col-lg-2">
+                    <input class="form-control input-sm" type="text" placeholder="분야">
+                </div>
+                <div class=" col-lg-4">
+                    <input class="form-control input-sm" type="date">
+                </div>
+                <div class=" col-sm-2">
+                    <button type="button" class="btn btn-primary btn-sm " id="n">추가</button>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
@@ -201,28 +199,29 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
 <script src="js/myLibrary.js"></script>
 <script>
-	const completedProjects = $('#completedProjects');
-	const certificate = $('#certificate');
-	const awards = $('#awards');
-	const createBtn = $('#createBtn');
+	const completedProjectList = $('#completedProjectList');
+	const certificateList = $('#certificateList');
+	const awardList = $('#awardList');
+	const certificateAddBtn = $('#certificateAddBtn');
 
 	async function init() {
-		completedProjects.empty();
+		completedProjectList.empty();
+		certificateList.empty();
 
 		try {
 			await $.get(getAjaxObject('./api/user/'));
 			const projectObjs = await $.get(getAjaxObject(`./api/project/list/complete`));
+			const certificates = await $.get(getAjaxObject(`./api/certificate/list`));
 
 			// 프로젝트 목록
-            let projectIndex = 1;
 			projectObjs.map((projectObj) => {
 				const presentNumbers = {}, allNumbers = {};
-				const [presentNumber , allNumber] = getMemberNumbers(projectObj, presentNumbers, allNumbers, 0);
-				let item = `<tr><td>${projectIndex++}</td><td class="dropdown">` +
+				const [presentNumber, allNumber] = getMemberNumbers(projectObj, presentNumbers, allNumbers, 0);
+				let item = `<tr><td></td><td class="dropdown">` +
 					`<a href="./project.html?no=${projectObj.project.no}&check=y&complete=y">${projectObj.project.title}</a>` +
 					'<a class="dropdown-toggle pull-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>' +
 					`<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">${projectObj.project.content}</div></td>` +
-                    `<td>${new Date(projectObj.project.completedTime).format('yyyy-MM-dd')}</td><td>${projectObj.project.organizer.nickname}</td>` +
+					`<td>${new Date(projectObj.project.completedTime).format('yyyy-MM-dd')}</td><td>${projectObj.project.organizer.nickname}</td>` +
 					`<td class="dropdown">${presentNumber} / ${allNumber}` +
 					'<span class="pull-right">▽</span>' +
 					'<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">';
@@ -231,16 +230,65 @@
 					item += `${field} ${presentNumbers[field]} / ${allNumbers[field]}<br>`;
 				}
 
-				completedProjects.append(item.substr(0, item.length - 4) + '</div></td></tr>');
+				completedProjectList.append(item.substr(0, item.length - 4) + '</div></td></tr>');
 			});
+
+			updateIndex(completedProjectList);
+
+			// 자격증 목록
+			certificates.map((certificate) => {
+				let item = `<tr><td>${index++}</td><td class="dropdown">${certificate.name}</td><td>${certificate.field}</td>` +
+					`<td class="dropdown">${new Date(certificate.acquisitionDate).format('yyyy-MM-dd')}</td>` +
+					`<td><input type="checkbox" value="${certificate.no}"></td></tr>`;
+
+				certificateList.append(item);
+			});
+
+			updateIndex(certificateList);
 		}
 		catch (e) {
 			alert('세션이 만료되었습니다.');
 			window.location = './signIn.html';
 		}
 
-		createBtn.on('click', (e) => window.location = './createProject.html');
+		certificateAddBtn.on('click', (e) => {
+			if (!$('#certificateName').val()) {
+				alert('자격증 이름을 적어주세요.');
+			}
+			else if (!$('#certificateField').val()) {
+				alert('자격증 분야를 적어주세요.');
+			}
+			else if (!$('#certificateDate').val()) {
+				alert('자격증 취득 날짜를 적어주세요.');
+			}
+			else {
+				insertCertificate();
+			}
+		});
 	}
+
+	async function insertCertificate() {
+		try {
+			const insertedCertificate = await $.post(getAjaxObject(`./api/certificate/insert`, $('#certificateForm').serialize()));
+
+			let item = `<tr><td></td><td class="dropdown">${insertedCertificate.name}</td><td>${insertedCertificate.field}</td>` +
+				`<td class="dropdown">${new Date(insertedCertificate.acquisitionDate).format('yyyy-MM-dd')}</td>` +
+				`<td><input type="checkbox" value="${insertedCertificate.no}"></td></tr>`;
+
+			certificateList.append(item);
+			updateIndex(certificateList);
+		}
+		catch (e) {
+			console.log(e);
+			alert('추가할 수 없습니다.');
+		}
+	}
+
+	function updateIndex(list) {
+		list.children('tr').each((index, item) => {
+			$(item).children('td').eq(0).text(index + 1);
+        })
+    }
 
 	init();
 </script>
