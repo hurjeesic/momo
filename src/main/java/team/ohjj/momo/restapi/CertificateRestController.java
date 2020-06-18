@@ -29,11 +29,10 @@ public class CertificateRestController {
 	}
 
 	@DeleteMapping("/delete")
-	public Boolean deleteMyCertificates(HttpSession session, @RequestParam CertificateList certificateList) {
+	public Boolean deleteMyCertificateList(HttpSession session, @ModelAttribute CertificateList certificateList) {
 		User user = (User)session.getAttribute("user");
 		for (Certificate certificate : certificateList.getCertificateList()) {
-			certificate.setUser(user);
-			certificateJpaRepository.delete(certificate);
+			certificateJpaRepository.deleteById(certificate.getNo());
 		}
 
 		return true;

@@ -26,7 +26,7 @@ public class Certificate {
 	@JsonIgnore
 	private User user;
 
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true)
 	@JsonProperty
 	private String name;
 
