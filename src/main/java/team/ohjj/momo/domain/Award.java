@@ -14,7 +14,7 @@ import java.util.Calendar;
 @Getter
 @Setter
 @ToString
-public class Awards {
+public class Award {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonProperty
