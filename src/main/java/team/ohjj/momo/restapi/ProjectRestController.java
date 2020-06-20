@@ -47,7 +47,7 @@ public class ProjectRestController {
 
 		for (int i = 0; i < allProject.size(); i++) {
 			if (memberJpaRepository.findByProjectAndUser(allProject.get(i), user).isPresent() ||
-				applicantJpaRepository.findByProjectAndUser(allProject.get(i), user).isPresent()) {
+					applicantJpaRepository.findByProjectAndUser(allProject.get(i), user).isPresent()) {
 				allProject.remove(i--);
 			}
 		}
@@ -119,27 +119,45 @@ public class ProjectRestController {
 	}
 
 	@GetMapping("/list/complete")
-	public List<Project> getMyCompletedProjectList(HttpSession session) {
+	public List<Map<String, Object>> getMyCompletedProjectList(HttpSession session) {
 		User user = (User)session.getAttribute("user");
 		List<Project> myAllProject = projectJpaRepository.findAllByComplete(true);
+		List<Map<String, Object>> result = new ArrayList<>();
 
 		for (int i = 0; i < myAllProject.size(); i++) {
-			if (!memberJpaRepository.findByProjectAndUser(myAllProject.get(i), user).isPresent()) {
+			if (!memberJpaRepository.findByProjectAndUser(myAllProject.get(i), user).isPresent() ||
+					!portfolioJpaRepository.findByProjectAndUser(myAllProject.get(i), user).isPresent()) {
 				myAllProject.remove(i--);
 			}
 		}
 
-		return myAllProject;
+		for (Project presentProject : myAllProject) {
+			Map<String, Object> projectObj = new HashMap<>();
+
+			List<ApplyField> applyFieldList = applyFieldJpaRepository.findAllByProject(presentProject);
+			List<Member> memberList = memberJpaRepository.findAllByProject(presentProject);
+
+			if (presentProject.getContent().length() > 20) {
+				presentProject.setContent(presentProject.getContent().substring(0, 20) + "...");
+			}
+
+			projectObj.put("project", presentProject);
+			projectObj.put("applyFields", applyFieldList);
+			projectObj.put("members", memberList);
+			result.add(projectObj);
+		}
+
+		return result;
 	}
 
-	@GetMapping("/list/complete/portfolio")
-	public List<Project> getMyCompletedProjectListForPortfolio(HttpSession session) {
+	@GetMapping("/list/complete/review")
+	public List<Project> getMyCompletedProjectListForReview(HttpSession session) {
 		User user = (User)session.getAttribute("user");
 		List<Project> myAllProject = projectJpaRepository.findAllByComplete(true);
 
 		for (int i = 0; i < myAllProject.size(); i++) {
 			if (!memberJpaRepository.findByProjectAndUser(myAllProject.get(i), user).isPresent() ||
-				portfolioJpaRepository.findByProjectAndUser(myAllProject.get(i), user).isPresent()) {
+					portfolioJpaRepository.findByProjectAndUser(myAllProject.get(i), user).isPresent()) {
 				myAllProject.remove(i--);
 			}
 		}
@@ -221,10 +239,12 @@ public class ProjectRestController {
 			organizer.setComplete(true);
 			memberJpaRepository.save(organizer);
 			Calendar presentTime = Calendar.getInstance();
+			project.setProcess((byte)2);
 			project.setEnd(presentTime);
 			project.setComplete(true);
 			project.setCompletedTime(presentTime);
 			projectJpaRepository.save(project);
+			applicantJpaRepository.deleteAllByProject(project);
 		}
 		else {
 			return false;
