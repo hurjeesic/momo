@@ -124,7 +124,6 @@
                                     <th class="col-sm-offset-1 col-sm-1">선택</th>
                                 </tr>
                                 </thead>
-
                                 <tbody id="certificateList">
                                 <tr>
                                     <td>1</td>
@@ -139,59 +138,72 @@
                     </div>
                 </div>
                 <form id="certificateAddForm">
-                    <div class=" col-lg-4">
+                    <div class="col-lg-4">
                         <input type="text" name="name" class="form-control input-sm" id="certificateName" placeholder="제목">
                     </div>
-                    <div class=" col-lg-2">
+                    <div class="col-lg-2">
                         <input type="text" name="field" class="form-control input-sm" id="certificateField" placeholder="분야">
                     </div>
-                    <div class=" col-lg-4">
+                    <div class="col-lg-4">
                         <input type="date" name="acquisitionDate" class="form-control input-sm" id="certificateDate">
                     </div>
-                    <div class=" col-sm-2">
+                    <div class="col-sm-2">
                         <button type="button" class="btn btn-primary btn-sm" id="certificateAddBtn">추가</button>
                     </div>
                 </form>
             </div>
-            <div class=" main-area col-sm-offset-1 col-md-5">
+            <div class="main-area col-sm-offset-1 col-md-5">
                 <h3>수상경력</h3>
-                <button class="pull-right">삭제</button>
+                <button type="button" class="pull-right" id="awardDeleteBtn">삭제</button>
                 <div class="">
                     <div class="table">
-                        <table class="table table-hover results">
-                            <thead>
-                            <tr>
-                                <th class="col-sm-1">no.</th>
-                                <th class="col-sm-4">제목</th>
-                                <th class="col-sm-2">분야</th>
-                                <th class="col-sm-2">수상일시</th>
-                                <th class="col-sm-offset-1 col-sm-1">선택</th>
-                            </tr>
-                            </thead>
-                            <tbody id="awardList">
-                            <tr>
-                                <td>1</td>
-                                <td class="dropdown">잠자기 대회</td>
-                                <td>수면</td>
-                                <td class="dropdown">2020/04/27</td>
-                                <td><input class="" type="checkbox"></td>
-                            </tr>
-                            </tbody>
-                        </table>
+                        <form id="awardDeleteForm">
+                            <table class="table table-hover results">
+                                <thead>
+                                <tr>
+                                    <th class="col-sm-1">no.</th>
+                                    <th class="col-sm-3">제목</th>
+                                    <th class="col-sm-2">분야</th>
+                                    <th class="col-sm-2">규모</th>
+                                    <th class="col-sm-2">수상일시</th>
+                                    <th class="col-sm-offset-1 col-sm-1">선택</th>
+                                </tr>
+                                </thead>
+                                <tbody id="awardList">
+                                <tr>
+                                    <td>1</td>
+                                    <td class="dropdown">잠자기 대회</td>
+                                    <td>수면</td>
+                                    <td>전국</td>
+                                    <td class="dropdown">2020/04/27</td>
+                                    <td><input type="checkbox"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </form>
                     </div>
                 </div>
-                <div class=" col-lg-4">
-                    <input class="form-control input-sm" type="text" placeholder="제목">
-                </div>
-                <div class=" col-lg-2">
-                    <input class="form-control input-sm" type="text" placeholder="분야">
-                </div>
-                <div class=" col-lg-4">
-                    <input class="form-control input-sm" type="date">
-                </div>
-                <div class=" col-sm-2">
-                    <button type="button" class="btn btn-primary btn-sm " id="n">추가</button>
-                </div>
+                <form id="awardAddForm">
+                    <div class="col-lg-4">
+                        <input type="text" name="title" class="form-control input-sm" id="awardTitle" placeholder="제목">
+                    </div>
+                    <div class="col-lg-2">
+                        <input type="text" name="field" class="form-control input-sm" id="awardField" placeholder="분야">
+                    </div>
+                    <div class="col-lg-2">
+                        <select name="scale" id="awardScale">
+                            <option value="LOCAL">지역</option>
+                            <option value="NATIONAL">전국</option>
+                            <option value="INTERNATIONAL">국제</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-4">
+                        <input type="date" name="acquisitionDate" class="form-control input-sm" id="awardDate">
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-sm" id="awardAddBtn">추가</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -207,15 +219,19 @@
 	const awardList = $('#awardList');
 	const certificateAddBtn = $('#certificateAddBtn');
 	const certificateDeleteBtn = $('#certificateDeleteBtn');
+	const awardAddBtn = $('#awardAddBtn');
+	const awardDeleteBtn = $('#awardDeleteBtn');
 
 	async function init() {
 		completedProjectList.empty();
 		certificateList.empty();
+		awardList.empty();
 
 		try {
 			await $.get(getAjaxObject('./api/user/'));
 			const projectObjs = await $.get(getAjaxObject(`./api/project/list/complete`));
 			const certificates = await $.get(getAjaxObject(`./api/certificate/list`));
+			const awards = await $.get(getAjaxObject(`./api/award/list`));
 
 			// 프로젝트 목록
 			projectObjs.map((projectObj) => {
@@ -242,14 +258,27 @@
 			// 자격증 목록
 			certificates.map((certificate) => {
 				const item = `<tr><input type="hidden" value="${certificate.no}"><td></td>` +
-                    `<td class="dropdown">${certificate.name}</td><td>${certificate.field}</td>` +
+					`<td class="dropdown">${certificate.name}</td><td>${certificate.field}</td>` +
 					`<td class="dropdown">${new Date(certificate.acquisitionDate).format('yyyy-MM-dd')}</td>` +
-					`<td><input type="checkbox" value=""></td></tr>`;
+					`<td><input type="checkbox"></td></tr>`;
 
 				certificateList.append(item);
 			});
 
 			updateIndex(certificateList);
+
+			// 상장 목록
+			const scale = { 'LOCAL': '지역', 'NATIONAL': '전국', 'INTERNATIONAL': '국제' };
+			awards.map((award) => {
+				let item = `<tr><input type="hidden" value="${award.no}"><td></td>` +
+					`<td class="dropdown">${award.title}</td><td>${award.field}</td><td>${scale[award.scale]}</td>` +
+					`<td class="dropdown">${new Date(award.acquisitionDate).format('yyyy-MM-dd')}</td>` +
+					`<td><input type="checkbox"></td></tr>`;
+
+				awardList.append(item);
+			});
+
+			updateIndex(awardList);
 		}
 		catch (e) {
 			alert('세션이 만료되었습니다.');
@@ -286,15 +315,47 @@
 
 			deleteCertificate(deletedList);
 		});
+
+		awardAddBtn.on('click', (e) => {
+			e.preventDefault();
+
+			if (!$('#awardTitle').val()) {
+				alert('상장 이름을 적어주세요.');
+			}
+			else if (!$('#awardField').val()) {
+				alert('상장 분야를 적어주세요.');
+			}
+			else if (!$('#awardDate').val()) {
+				alert('상장 취득 날짜를 적어주세요.');
+			}
+			else {
+				insertAward();
+			}
+		});
+
+		awardDeleteBtn.on('click', (e) => {
+			e.preventDefault();
+
+			const deletedList = [];
+			awardList.find('input[type=checkbox]:checked').each((index, item) => {
+				const root = $(item).parent().parent();
+				root.children().eq(0).attr('name', `AwardList[${index}].no`);
+
+				deletedList.push(root);
+			});
+
+			deleteAward(deletedList);
+		});
 	}
 
 	async function insertCertificate() {
 		try {
 			const insertedCertificate = await $.post(getAjaxObject(`./api/certificate/insert`, $('#certificateAddForm').serializeArray()));
 
-			let item = `<tr><td></td><td class="dropdown">${insertedCertificate.name}</td><td>${insertedCertificate.field}</td>` +
+			let item = `<tr><input type="hidden" value="${insertedCertificate.no}"><td></td>` +
+                `<td class="dropdown">${insertedCertificate.name}</td><td>${insertedCertificate.field}</td>` +
 				`<td class="dropdown">${new Date(insertedCertificate.acquisitionDate).format('yyyy-MM-dd')}</td>` +
-				`<td><input type="checkbox" value="${insertedCertificate.no}"></td></tr>`;
+				`<td><input type="checkbox"></td></tr>`;
 
 			certificateList.append(item);
 			updateIndex(certificateList);
@@ -312,6 +373,39 @@
 				}
 
 				updateIndex(certificateList);
+			}
+		}
+		catch (e) {
+			alert('삭제에 실패하였습니다.');
+		}
+	}
+
+	async function insertAward() {
+		try {
+			const insertedAward = await $.post(getAjaxObject(`./api/award/insert`, $('#awardAddForm').serializeArray()));
+			const scale = { 'LOCAL': '지역', 'NATIONAL': '전국', 'INTERNATIONAL': '국제' };
+			let item = `<tr><input type="hidden" value="${insertedAward.no}"><td></td>` +
+				`<td class="dropdown">${insertedAward.title}</td><td>${insertedAward.field}</td>` +
+                `<td>${scale[insertedAward.scale]}</td>` +
+				`<td class="dropdown">${new Date(award.acquisitionDate).format('yyyy-MM-dd')}</td>` +
+				`<td><input type="checkbox"></td></tr>`;
+
+			awardList.append(item);
+			updateIndex(awardList);
+		}
+		catch (e) {
+			alert('추가에 실패하였습니다.');
+		}
+	}
+
+	async function deleteAward(deletedList) {
+		try {
+			if (await $.delete(getAjaxObject(`./api/award/delete`, $('#awardDeleteForm').serializeArray()))) {
+				while (deletedList.length > 0) {
+					deletedList.pop().remove();
+				}
+
+				updateIndex(awardList);
 			}
 		}
 		catch (e) {

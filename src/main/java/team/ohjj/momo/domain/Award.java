@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.Calendar;
@@ -38,6 +39,7 @@ public class Award {
 	private SCALE scale;
 
 	@Column(name = "acquisition_date", nullable = false)
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@JsonProperty
 	private Calendar acquisitionDate;
 }
