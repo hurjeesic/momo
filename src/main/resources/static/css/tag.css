@@ -1,0 +1,29 @@
+ul#tagList {
+    padding: 16px 0;
+    list-style: none;
+}
+
+ul#tagList li {
+    display: inline-block;
+    margin: 0 5px;
+    font-size: 14px;
+    letter-spacing: -.5px;
+}
+
+ul#tagList li.tagItem {
+    padding: 4px 8px;
+    background-color: #777;
+    color: #000;
+}
+
+.tagItem:hover {
+    background-color: #262626;
+    color: #fff;
+}
+
+.tagDeleteBtn {
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 8px;
+}

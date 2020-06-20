@@ -6,6 +6,7 @@
     <title>프로젝트 생성</title>
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/myStyle.css">
+    <link rel="stylesheet" href="css/tag.css">
     <style type="text/css">
         .jumbotron {
             background-image: url('images/bonobono.jpg');
@@ -17,6 +18,7 @@
         .dropdown:hover > .dropdown-menu {
             display: block;
         }
+
         .noresize {
             resize: none; /* 사용자 임의 변경 불가 */
         }
@@ -105,7 +107,9 @@
         <div class="container input-group input-group-lg">
             <h4><b>태그</b></h4>
             <div class="col-sm-6">
-                <textarea name="content" class="form-control noresize" id="" rows="1"></textarea>
+                <input type="hidden" name="tag" id="tag">
+                <ul id="tagList"></ul>
+                <input type="text" class="form-control noresize" id="inputTag" rows="1">
             </div>
         </div>
 
@@ -136,6 +140,9 @@
 	const myFieldTxt = $('#myFieldTxt');
 	const startDateTxt = $('#startDate');
 	const endDateTxt = $('#endDate');
+
+	const tag = {};
+	let counter = 0;
 
 	async function init() {
 		try {
@@ -178,6 +185,7 @@
 				const [valid, fieldValid] = checkFieldsValidation();
 				if (valid) {
 					if (fieldValid) {
+						$('#tag').val(marginTag());
 						createProject();
 					}
 					else {
@@ -189,6 +197,42 @@
 		});
 
 		cancelBtn.on('click', (e) => window.location = './index.html');
+
+		function marginTag() {
+			return Object.values(tag).filter((word) => {
+				return word !== '';
+			});
+		}
+
+		$('#inputTag').on('keypress', function (e) {
+			// input 에 focus 되있을 때 엔터 및 스페이스바 입력시 구동
+			if (e.key === 'Enter' || e.keyCode == 32) {
+				e.preventDefault();
+				const tagValue = $(this).val(); // 값 가져오기
+				if (tagValue !== '') {
+
+					// 같은 태그가 있는지 검사, 있다면 해당 값을 배열로 반환
+					const result = Object.values(tag).filter((word) => {
+						return word === tagValue;
+					});
+
+					// 태그 중복 검사
+					if (result.length == 0) {
+						$('#tagList').append(`<li class='tagItem'>${tagValue}<span class='tagDeleteBtn' index='${counter}'>x</span></li>`);
+						tag[counter++] = tagValue;
+						$(this).val('');
+					}
+					else {
+						alert('태그값이 중복됩니다.');
+					}
+				}
+			}
+		});
+
+		$(document).on('click', '.tagDeleteBtn', (e) => {
+			tag[$(e.target).attr('index')] = '';
+			$(e.target).parent().remove();
+		});
 	}
 
 	function checkFormValidation() {
