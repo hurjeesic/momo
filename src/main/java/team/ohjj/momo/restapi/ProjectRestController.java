@@ -1,6 +1,7 @@
 package team.ohjj.momo.restapi;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import team.ohjj.momo.domain.*;
 import team.ohjj.momo.entity.*;
@@ -37,7 +38,7 @@ public class ProjectRestController {
 	}
 
 	@GetMapping("/list/{pageNo}")
-	public List<Map<String, Object>> getProjectList(HttpSession session, @PathVariable Integer pageNo) {
+	public List<Map<String, Object>> getProjectList(HttpSession session, @PathVariable Integer pageNo, @Nullable @RequestParam String tags) {
 		User user = (User)session.getAttribute("user");
 
 		List<Project> allProject = projectJpaRepository.findAllByOrganizerNot(user);
@@ -49,6 +50,27 @@ public class ProjectRestController {
 			if (memberJpaRepository.findByProjectAndUser(allProject.get(i), user).isPresent() ||
 					applicantJpaRepository.findByProjectAndUser(allProject.get(i), user).isPresent()) {
 				allProject.remove(i--);
+			}
+			else if (tags != null) {
+				String[] tagAry = tags.split(",");
+				String[] myTagAry = allProject.get(i).getTag().split(",");
+				boolean bTag = false;
+				for (String tag : tagAry) {
+					for (String myTag : myTagAry) {
+						if (tag.equals(myTag)) {
+							bTag = true;
+							break;
+						}
+					}
+
+					if (bTag) {
+						break;
+					}
+				}
+
+				if (!bTag) {
+					allProject.remove(i--);
+				}
 			}
 		}
 
