@@ -6,6 +6,7 @@
     <title>프로젝트 생성</title>
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/myStyle.css">
+    <link rel="stylesheet" href="css/tag.css">
     <style type="text/css">
         .jumbotron {
             background-image: url('images/bonobono.jpg');
@@ -91,7 +92,6 @@
             <div class="col-sm-4">
                 <label class="radio-inline"><input type="radio" name="process" value="0">모집 중</label>
                 <label class="radio-inline"><input type="radio" name="process" value="1">진행 중</label>
-                <label class="radio-inline"><input type="radio" name="process" value="2">완료</label>
             </div>
         </div>
 
@@ -100,6 +100,15 @@
             <div class="col-sm-3">
                 <label class="radio-inline"><input type="radio" name="apply" value="0">가능</label>
                 <label class="radio-inline"><input type="radio" name="apply" value="1">진행 중</label>
+            </div>
+        </div>
+
+        <div class="container input-group input-group-lg">
+            <h4><b>태그</b></h4>
+            <div class="col-sm-6">
+                <input type="hidden" name="tag" id="tag">
+                <ul id="tagList"></ul>
+                <input type="text" class="form-control noresize" id="inputTag" rows="1">
             </div>
         </div>
 
@@ -133,6 +142,9 @@
 	const params = getParameters();
 	const presentNumbers = {};
 
+	const tag = {};
+	let counter = 0;
+
 	async function init() {
 		try {
 			await $.get(getAjaxObject('./api/user/'));
@@ -147,6 +159,13 @@
 			contentTxt.val(projectObj.project.content);
 			$(`input:radio[name="process"]:radio[value="${projectObj.project.process}"]`).prop('checked', true);
 			$(`input:radio[name="apply"]:radio[value="${projectObj.project.apply}"]`).prop('checked', true);
+			if (projectObj.project.tag) {
+				let tags = projectObj.project.tag.split(',');
+				for (const index in tags) {
+					$('#tagList').append(`<li class='tagItem'>${tags[index]}<span class='tagDeleteBtn' index='${counter}'>x</span></li>`);
+					tag[counter++] = tags[index];
+				}
+            }
 		}
 		catch (e) {
 			alert('세션이 만료되었습니다.');
@@ -161,6 +180,7 @@
 				const [valid, fieldValid] = checkFieldsValidation();
 				if (valid) {
 					if (fieldValid) {
+						$('#tag').val(marginTag());
 						updateProject();
 					}
 					else {
@@ -172,6 +192,42 @@
 		});
 
 		cancelBtn.on('click', (e) => window.location = './index.html');
+
+		function marginTag() {
+			return Object.values(tag).filter((word) => {
+				return word !== '';
+			});
+		}
+
+		$('#inputTag').on('keypress', function (e) {
+			// input 에 focus 되있을 때 엔터 및 스페이스바 입력시 구동
+			if (e.key === 'Enter' || e.keyCode == 32) {
+				e.preventDefault();
+				const tagValue = $(this).val(); // 값 가져오기
+				if (tagValue !== '') {
+
+					// 같은 태그가 있는지 검사, 있다면 해당 값을 배열로 반환
+					const result = Object.values(tag).filter((word) => {
+						return word === tagValue;
+					});
+
+					// 태그 중복 검사
+					if (result.length == 0) {
+						$('#tagList').append(`<li class='tagItem'>${tagValue}<span class='tagDeleteBtn' index='${counter}'>x</span></li>`);
+						tag[counter++] = tagValue;
+						$(this).val('');
+					}
+					else {
+						alert('태그값이 중복됩니다.');
+					}
+				}
+			}
+		});
+
+		$(document).on('click', '.tagDeleteBtn', (e) => {
+			tag[$(e.target).attr('index')] = '';
+			$(e.target).parent().remove();
+		});
 	}
 
 	function callbackPresent(projectObj, member) {

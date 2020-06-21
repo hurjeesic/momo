@@ -105,7 +105,7 @@
             <div class="row">
                 <div class="">
                     <h1>태그</h1>
-                    <ul class="list-group">
+                    <ul class="list-group" id="tagGroup">
                         <li class="list-group-item"><input class="pull-left" type="checkbox">&nbsp; 게임</li>
                         <li class="list-group-item"><input class="pull-left" type="checkbox">&nbsp; 대회출전</li>
                         <li class="list-group-item"><input class="pull-left" type="checkbox">&nbsp; 웹</li>
@@ -126,18 +126,41 @@
 	const pageNo = params.page;
 	const projectList = $('#projectList');
 	const createBtn = $('#createBtn');
+	let tags;
 
 	async function init() {
-		projectList.empty();
-
 		try {
 			await $.get(getAjaxObject('./api/user/'));
-			const projectObjs = await $.get(getAjaxObject(`./api/project/list/${pageNo == undefined ? 1 : pageNo}`));
 
-			// 프로젝트 목록
+			search(null);
+		}
+		catch (e) {
+			alert('세션이 만료되었습니다.');
+			window.location = './signIn.html';
+		}
+
+		createBtn.on('click', (e) => window.location = './createProject.html');
+
+		$('#tagGroup input:checkbox').click((e) => {
+			tags = '';
+			$('#tagGroup input:checkbox:checked').map((index, value) => tags += (tags ? `,` : '') + $(value).parent().text().trim());
+			search(tags ? tags : null);
+		});
+	}
+
+	async function search(tag) {
+		projectList.empty();
+		const tags = {};
+		if (tag) {
+			tags['tags'] = tag;
+		}
+
+		try {
+			const projectObjs = await $.get(getAjaxObject(`./api/project/list/${pageNo == undefined ? 1 : pageNo}`, tags));
+
 			projectObjs.map((projectObj) => {
 				const processList = ['모집중', '진행중', '완료'], presentNumbers = {}, allNumbers = {};
-				const [presentNumber , allNumber] = getMemberNumbers(projectObj, presentNumbers, allNumbers, 0);
+				const [presentNumber, allNumber] = getMemberNumbers(projectObj, presentNumbers, allNumbers, 0);
 				let item = `<tr><td>${projectObj.project.no}</td><td class="dropdown">` +
 					`<a href="./project.html?no=${projectObj.project.no}">${projectObj.project.title}</a>` +
 					'<a class="dropdown-toggle pull-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>' +
@@ -156,10 +179,7 @@
 		}
 		catch (e) {
 			alert('세션이 만료되었습니다.');
-			window.location = './signIn.html';
 		}
-
-		createBtn.on('click', (e) => window.location = './createProject.html');
 	}
 
 	init();
