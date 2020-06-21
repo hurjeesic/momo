@@ -29,10 +29,6 @@ public class Portfolio {
 	@JsonIgnore
 	private Project project;
 
-	@Column(name = "project_file")
-	@JsonProperty
-	private String projectFile;
-
 	@Column(nullable = false)
 	@JsonProperty
 	private String skill;

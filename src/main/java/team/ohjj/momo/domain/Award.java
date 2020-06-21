@@ -11,7 +11,7 @@ import javax.persistence.*;
 import java.util.Calendar;
 
 @Entity
-@Table(name = "awards")
+@Table(name = "award")
 @Getter
 @Setter
 @ToString

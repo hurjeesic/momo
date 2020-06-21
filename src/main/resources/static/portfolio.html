@@ -71,6 +71,7 @@
                                 <th class="col-sm-2">종료일시</th>
                                 <th class="col-md-2">주최자</th>
                                 <th class="col-md-2">인원</th>
+                                <th class="col-md-2">파일</th>
                             </tr>
                             </thead>
                             <tbody id="completedProjectList">
@@ -249,7 +250,10 @@
 					item += `${field} ${presentNumbers[field]} / ${allNumbers[field]}<br>`;
 				}
 
-				completedProjectList.append(item.substr(0, item.length - 4) + '</div></td></tr>');
+				item = `${item.substr(0, item.length - 4)}</div></td>` +
+					`<td><a href="/api/portfolio/download/${projectObj.project.no}" class="pull-left">다운로드</a></td></tr>`;
+
+				completedProjectList.append(item);
 			});
 
 			updateIndex(completedProjectList);
@@ -352,7 +356,7 @@
 			const insertedCertificate = await $.post(getAjaxObject(`./api/certificate/insert`, $('#certificateAddForm').serializeArray()));
 
 			let item = `<tr><input type="hidden" value="${insertedCertificate.no}"><td></td>` +
-                `<td class="dropdown">${insertedCertificate.name}</td><td>${insertedCertificate.field}</td>` +
+				`<td class="dropdown">${insertedCertificate.name}</td><td>${insertedCertificate.field}</td>` +
 				`<td class="dropdown">${new Date(insertedCertificate.acquisitionDate).format('yyyy-MM-dd')}</td>` +
 				`<td><input type="checkbox"></td></tr>`;
 
@@ -385,7 +389,7 @@
 			const scale = { 'LOCAL': '지역', 'NATIONAL': '전국', 'INTERNATIONAL': '국제' };
 			let item = `<tr><input type="hidden" value="${insertedAward.no}"><td></td>` +
 				`<td class="dropdown">${insertedAward.title}</td><td>${insertedAward.field}</td>` +
-                `<td>${scale[insertedAward.scale]}</td>` +
+				`<td>${scale[insertedAward.scale]}</td>` +
 				`<td class="dropdown">${new Date(award.acquisitionDate).format('yyyy-MM-dd')}</td>` +
 				`<td><input type="checkbox"></td></tr>`;
 

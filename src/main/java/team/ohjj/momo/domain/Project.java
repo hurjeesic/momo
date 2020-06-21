@@ -3,6 +3,7 @@ package team.ohjj.momo.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -12,6 +13,7 @@ import java.util.Calendar;
 @Entity
 @Getter
 @Setter
+@ToString
 public class Project implements Serializable {
     private static final long serialVersionUID = 6494678977089006639L;
 
@@ -62,4 +64,8 @@ public class Project implements Serializable {
     @Column(name = "completed_time")
     @JsonProperty
     private Calendar completedTime;
+
+    @Column(name = "file_name")
+    @JsonProperty
+    private String fileName;
 }

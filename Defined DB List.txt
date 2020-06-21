@@ -1,0 +1,102 @@
+mysql -hlocalhost -uroot -p
+
+drop database if exists momo;
+create database momo;
+
+use momo;
+
+create table user(
+no int(3) primary key auto_increment,
+email varchar(32) unique key not null,
+password varchar(32) not null,
+nickname varchar(20) unique key not null,
+phone varchar(13),
+type int(1) not null
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+insert into user(email, password, nickname, phone, type) values ('hurjeesic@naver.com', 'HJS10136!', 'jeesic', '010-1234-5678', 2);
+insert into user(email, password, nickname, phone, type) values ('jshur2015108211@gmail.com', 'HJS10136!', 'jimen', '010-1554-5678', 2);
+insert into user(email, password, nickname, phone, type) values ('cake427@naver.com', 'cake427', 'cake427', '010-1536-5678', 2);
+insert into user(email, password, nickname, phone, type) values ('test@naver.com', 'test', 'test', '010-1536-4325', 2);
+
+create table project(
+no int(11) primary key auto_increment, # 프로젝트 번호
+title varchar(32) not null, # 제목
+content varchar(512) not null, # 내용
+start datetime not null default now(), # 시작일자
+end datetime not null default now(), # 종료일자
+organizer int(11) not null references user(no), # 프로젝트 관리자
+process int(1) default 0, # 진행 상황(모집 중, 진행 중, 완료)
+apply int(1) default 0,  # 지원 가능 여부(가능, 불가능)
+tag varchar(128), # 검색에 필요한 태그
+complete boolean default false, # 프로젝트 완료 여부
+completed_time datetime, # 프로젝트 완료 시간
+file_name varchar(32) # 프로젝트 작업물이 저장된 url
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+create table portfolio(
+no int(11) primary key auto_increment,
+user int(3) not null references user(no), # 포트폴리오 맴버 번호
+project int(11) not null references project(no), # 프로젝트 번호
+skill varchar(128) not null, # 프로젝트에 사용된 기술 목록
+content varchar(512) not null, # 프로젝트 후기
+unique portfolio_index (project, user)
+)ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+create table apply_field(
+no int(11) primary key auto_increment, # 지원 분야 번호
+project int(11) not null references project(no), # 참조 프로젝트
+field varchar(32) not null, # 지원 분야
+number int(1) not null, # 지원 가능한 인원 수
+unique field_index (project, field)
+)ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+create table member(
+no int(11) primary key auto_increment,
+project int(11) not null references project(no), # 프로젝트 번호
+user int(3) not null references user(no), # 프로젝트 맴버 번호
+field int(11) not null references apply_field(no), # 지원 분야 번호
+complete boolean not null default 0, # 프로젝트 완료 여부
+unique member_index(project, user)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+create table applicant(
+no int(11) primary key auto_increment,
+project int(11) not null references project(no), # 프로젝트 번호
+user int(3) not null references user(no), # 지원자 번호
+field int(11) not null references apply_field(no), # 지원 분야 번호
+content varchar(1024), # 자기 소개 내용
+unique applicant_index(project, user)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+create table chat_room(
+id char(36) primary key, # 대화방 id, UUID
+name varchar(128) not null, # 대화방 이름(기본: 기획자, 디자이너, 뮤지션, 개발자)
+project int(11) not null references project(no), # 참조 프로젝트 번호
+unique room_index (name, project)
+)ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+create table chat_message(
+no int(11) primary key auto_increment, # 대화 번호
+type int(1) not null, # 대화 타입(접속, 말)
+room char(36) not null references chat_room(id), # 대화방 id
+sender int(3) not null references user(no), # 전송자 no
+message varchar(1024) not null, # 대화 내용
+send_time datetime default now()
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+create table certificate(
+no int(11) primary key auto_increment,
+user int(3) not null references user(no), # 사용자 번호
+name varchar(32) not null unique, # 이름
+field varchar(32) not null, # 분야
+acquisition_date datetime not null # 취득일시
+)ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+create table award(
+no int(11) primary key auto_increment,
+user int(3) not null references user(no), # 사용자 번호
+title varchar(64) not null, # 제목
+field varchar(32) not null, # 분야
+scale int(1) not null, # 규모
+acquisition_date datetime not null # 취득일시
+)ENGINE=MyISAM DEFAULT CHARSET=utf8;
