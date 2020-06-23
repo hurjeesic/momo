@@ -276,7 +276,11 @@
 
 	function recvMessage(recv) {
 		if (recv.type == 'COMPLETE') {
-			console.log(chatUserList);
+			for (const item of chatUserList.contents()) {
+				if (item.firstChild.textContent == recv.sender.nickname && username != recv.sender.nickname) {
+					item.lastChild.checked = !item.lastChild.checked;
+				}
+			}
 		}
 		else {
 			if (recv.type == 'JOIN') {
