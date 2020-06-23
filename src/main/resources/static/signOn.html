@@ -15,12 +15,13 @@
     </div>
 </nav>
 
-<div class="container col-sm-offset-3 col-sm-6">
+
+<div class="col-sm-offset-3 col-sm-6">
     <form class="navbar-form ">
 <!--        이메일-->
-        <div class="container input-group ">
+        <div class="col-sm-8 input-group ">
             <h4><b>이메일</b></h4>
-            <div class="col-lg-6">
+            <div class="">
                 <input type="email" class="form-control" placeholder="@example.com" id="emailTxt">
                 <span class="input-group-btn">
                     <button type="button" class="btn btn-primary" id="emailBtn">중복확인</button>
@@ -31,18 +32,19 @@
                 </span>
             </div><!-- /.col-sm-6 -->
         </div>
+    </form>
 <!--        비밀번호-->
-        <div class="container input-group input-group-lg">
+        <div class=" input-group input-group-lg">
             <h4><b>비밀번호</b></h4>
-            <div class="col-sm-3">
+            <div class="col-sm-8">
                 <input type="password" class="form-control" placeholder="비밀번호" id="pwdTxt">
                 <input type="password" class="form-control" placeholder="비밀번호 확인" id="pwdCheckTxt">
             </div><!-- /.col-sm-6 -->
         </div>
 <!--        닉네임-->
-        <div class="container input-group input-group-lg">
+        <div class=" input-group ">
             <h4><b>닉네임</b></h4>
-            <div class="col-sm-6">
+            <div class="col-sm-8">
                 <input type="text" class="form-control" placeholder="홍길동" id="nicknameTxt">
                 <span class="input-group-btn">
                     <button type="button" class="btn btn-primary" id="nicknameCheckBtn">중복확인</button>
@@ -51,21 +53,20 @@
             </div><!-- /.col-sm-6 -->
         </div>
 <!--        전화번호-->
-        <div class="container input-group input-group-lg">
+        <div class="row  ">
             <h4><b>전화번호</b></h4>
             <div class="col-sm-6">
                 <input type="tel" class="form-control" id="phoneTxt" placeholder="010-xxxx-xxxx">
             </div><!-- /.col-sm-6 -->
         </div>
 <!--        가입버튼-->
-        <div class="input-group input-group-lg">
+        <div class=" ">
             <div class="row">
                 <div class="col text-center">
                     <button type="button" class="btn btn-primary btn-lg" id="signUpBtn">회원가입</button>
                 </div>
             </div>
         </div>
-    </form>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
