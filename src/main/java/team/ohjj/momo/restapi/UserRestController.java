@@ -36,6 +36,7 @@ public class UserRestController {
 
 	@PostMapping("/login")
 	public Integer login(HttpSession session, @ModelAttribute User user) {
+		System.out.println(user);
 		user = userJpaRepository.findByEmailAndPasswordAndType(user.getEmail(), user.getPassword(), user.getType()).get();
 
 		session.setMaxInactiveInterval(10 * minute);
@@ -73,7 +74,7 @@ public class UserRestController {
 	}
 
 	@GetMapping("/confirm/email")
-	public void getConfirmCode(HttpSession session, @RequestParam String email) throws MessagingException, UnsupportedEncodingException {
+	public Boolean getConfirmCode(HttpSession session, @RequestParam String email) throws MessagingException, UnsupportedEncodingException {
 		MailHandler mailHandler = new MailHandler(sender);
 
 		mailHandler.setFrom("jshur2015108211@gmail.com", "모모게시판");
@@ -90,6 +91,8 @@ public class UserRestController {
 		);
 
 		mailHandler.send();
+
+		return true;
 	}
 
 	@GetMapping("/confirm/email/check")

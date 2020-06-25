@@ -122,6 +122,7 @@
 
 	async function login() {
 		try {
+			console.log(pwdTxt.val());
 			if (checkLoginValidation()) {
 				await $.post(getAjaxObject('./api/user/login', {
 					email: emailTxt.val(),

@@ -247,7 +247,7 @@
 
 	async function confirmNickname() {
 		try {
-			const result = await $.get(getAjaxObject('./api/user/check/nickname'));
+			const result = await $.get(getAjaxObject('./api/user/check/nickname', { nickname: nicknameTxt.val() }));
 			if (result) {
 				alert('사용 가능한 닉네임입니다.');
 				nicknameTxt.attr('disabled', true);
@@ -270,7 +270,8 @@
 		try {
 			const result = await $.post(getAjaxObject('./api/user/insert', {
 				email: emailTxt.val(), password: pwdTxt.val(),
-				nickname: nicknameTxt.val(), phone: phoneTxt.val()
+				nickname: nicknameTxt.val(), phone: phoneTxt.val(),
+                type: 2
 			}));
 			if (result) {
 				alert('회원가입 성공하였습니다.');
